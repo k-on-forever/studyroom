@@ -4,8 +4,8 @@ package com.selfstudy.modules.applet.service.impl;
 import cn.binarywang.wx.miniapp.api.WxMaService;
 import cn.binarywang.wx.miniapp.config.WxMaConfig;
 import cn.hutool.http.HttpUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.selfstudy.common.exception.RRException;
@@ -26,8 +26,9 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,9 +53,10 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public R login(LoginForm form) {
-		UserEntity user = queryByAccount(form.getAccount());
-		Assert.isNull(user, "账号或密码错误");
+		UserEntity user = queryByAccount(form.getAccount().trim());
+		Assert.notNull(user, "账号或密码错误");
 
 		//密码错误
 		if(!user.getPassword().equals(DigestUtils.sha256Hex(form.getPassword()))){
@@ -88,6 +90,18 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 	}
 
 	@Override
+	@Transactional(rollbackFor = Exception.class)
+	public boolean resetPassword(String account, String newPlainPassword) {
+		UserEntity u = queryByAccount(account.trim());
+		if (u == null) {
+			return false;
+		}
+		u.setPassword(DigestUtils.sha256Hex(newPlainPassword));
+		return updateById(u);
+	}
+
+	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public R logout(Long userId) {
 		//生成一个token
 		String token = TokenGenerator.generateValue();
@@ -108,6 +122,7 @@ public class UserServiceImpl extends ServiceImpl<UserDao, UserEntity> implements
 	 * @return
 	 */
 	@Override
+	@Transactional(rollbackFor = Exception.class)
 	public R wxLogin(WXLoginForm wxLoginForm) {
 		String openid = getOpenId(wxLoginForm.getCode());
 		WXLoginVO wx = this.baseMapper.selectByOpenId(openid);

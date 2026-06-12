@@ -1,0 +1,21 @@
+<view class="br-page">
+  <view class="br-hint">以下为您的全部预约记录（含历史）</view>
+  <van-empty wx:if="{{ !loading && !list.length && !err }}" description="暂无订座记录" />
+  <van-empty wx:if="{{ !loading && err }}" description="{{ err }}" />
+  <view class="br-list" wx:if="{{ list.length }}">
+    <view
+      class="br-card"
+      wx:for="{{ list }}"
+      wx:key="id"
+      bindtap="goDetail"
+      data-id="{{ item.id }}"
+    >
+      <view class="br-card__top">
+        <text class="br-card__state">{{ item.stateText }}</text>
+        <text class="br-card__date">{{ item.bizDate || (item.seatDay && item.seatDay.slice(0,10)) }}</text>
+      </view>
+      <view class="br-card__loc">{{ item.floor }} · {{ item.roomName }} · {{ item.sname }}</view>
+      <view class="br-card__time">{{ item.seatDayDisplay }}</view>
+    </view>
+  </view>
+</view>

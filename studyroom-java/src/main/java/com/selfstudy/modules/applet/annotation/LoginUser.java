@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * 登录用户信息
  *
- * @author Mark 2891517520@qq.com
+ * @author kon-foreverkon-forever
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)

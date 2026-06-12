@@ -1,0 +1,65 @@
+.bd-page {
+  min-height: 100vh;
+  padding: 28rpx;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #e8f4ff 0%, #f6f8fc 38%, #f7f8fa 100%);
+}
+
+.bd-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 22rpx;
+  padding: 32rpx 28rpx;
+  box-shadow: 0 8rpx 28rpx rgba(28, 143, 250, 0.1);
+  border: 1rpx solid rgba(28, 143, 250, 0.07);
+}
+
+.bd-state {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #1c8ffa;
+  margin-bottom: 28rpx;
+}
+
+.bd-row {
+  display: flex;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #f0f2f5;
+  font-size: 28rpx;
+}
+
+.bd-row:last-child {
+  border-bottom: none;
+}
+
+.bd-k {
+  width: 140rpx;
+  color: #969799;
+  flex-shrink: 0;
+}
+
+.bd-v--pre {
+  white-space: pre-line;
+  line-height: 1.45;
+}
+
+.bd-v {
+  flex: 1;
+  color: #323233;
+  word-break: break-all;
+}
+
+.bd-pay {
+  color: #ee0a24;
+  font-weight: 600;
+}
+
+.bd-actions {
+  margin-top: 40rpx;
+}
+
+.bd-empty {
+  padding: 120rpx 32rpx;
+  text-align: center;
+  color: #969799;
+  font-size: 28rpx;
+}

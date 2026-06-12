@@ -89,9 +89,21 @@ var defaultFormatter = function (type, value) { return value; };
             type: Number,
             value: 0,
             observer: 'updateValue',
-        }, maxMinute: {
+        },         maxMinute: {
             type: Number,
             value: 59,
+            observer: 'updateValue',
+        }, sameDayEarliestMs: {
+            type: Number,
+            value: -1,
+            observer: 'updateValue',
+        },         minuteStep: {
+            type: Number,
+            value: 1,
+            observer: 'updateValue',
+        }, bookingAdvanceDays: {
+            type: Number,
+            value: -1,
             observer: 'updateValue',
         } }),
     data: {
@@ -134,12 +146,23 @@ var defaultFormatter = function (type, value) { return value; };
         },
         getOriginColumns: function () {
             var filter = this.data.filter;
+            var data = this.data;
+            var step = data.minuteStep > 1 ? data.minuteStep : 1;
             var results = this.getRanges().map(function (_a) {
                 var type = _a.type, range = _a.range;
-                var values = times(range[1] - range[0] + 1, function (index) {
-                    var value = range[0] + index;
-                    return type === 'year' ? "".concat(value) : padZero(value);
-                });
+                var values;
+                if (type === 'minute' && step > 1) {
+                    values = [];
+                    for (var vm = range[0]; vm <= range[1]; vm += step) {
+                        values.push(padZero(vm));
+                    }
+                }
+                else {
+                    values = times(range[1] - range[0] + 1, function (index) {
+                        var value = range[0] + index;
+                        return type === 'year' ? "".concat(value) : padZero(value);
+                    });
+                }
                 if (filter) {
                     values = filter(type, values);
                 }
@@ -161,8 +184,111 @@ var defaultFormatter = function (type, value) { return value; };
                     },
                 ];
             }
-            var _a = this.getBoundary('max', data.innerValue), maxYear = _a.maxYear, maxDate = _a.maxDate, maxMonth = _a.maxMonth, maxHour = _a.maxHour, maxMinute = _a.maxMinute;
-            var _b = this.getBoundary('min', data.innerValue), minYear = _b.minYear, minDate = _b.minDate, minMonth = _b.minMonth, minHour = _b.minHour, minMinute = _b.minMinute;
+            var _a = this.getBoundary('max', data.innerValue), maxHour = _a.maxHour, maxMinute = _a.maxMinute;
+            var _b = this.getBoundary('min', data.innerValue), minHour = _b.minHour, minMinute = _b.minMinute;
+            var minYear = 1900;
+            var maxYear = 2100;
+            var minMonth = 1;
+            var maxMonth = 12;
+            var minDate = 1;
+            var maxDate = 31;
+            /** 年/月/日列：仅按 minDate~maxDate 日历边界计算，不沿用 getBoundary（否则会误把「日」上限钉在 boundary 当天） */
+            if (data.type === 'datetime' || data.type === 'date') {
+                var ivCal = new Date(data.innerValue);
+                var yCal = ivCal.getFullYear();
+                var mCal = ivCal.getMonth();
+                var minCal = new Date(data.minDate);
+                var maxCal = new Date(data.maxDate);
+                if (data.bookingAdvanceDays != null && data.bookingAdvanceDays >= 0) {
+                    var todayWin = new Date();
+                    todayWin.setHours(0, 0, 0, 0);
+                    minCal = todayWin;
+                    maxCal = new Date(todayWin.getTime());
+                    maxCal.setDate(maxCal.getDate() + data.bookingAdvanceDays);
+                    maxCal.setHours(23, 59, 59, 999);
+                }
+                minYear = minCal.getFullYear();
+                maxYear = maxCal.getFullYear();
+                minMonth = 1;
+                maxMonth = 12;
+                minDate = 1;
+                maxDate = getMonthEndDay(yCal, mCal + 1);
+                if (yCal === minCal.getFullYear()) {
+                    minMonth = minCal.getMonth() + 1;
+                    if (mCal === minCal.getMonth()) {
+                        minDate = minCal.getDate();
+                    }
+                }
+                if (yCal === maxCal.getFullYear()) {
+                    maxMonth = maxCal.getMonth() + 1;
+                    if (mCal === maxCal.getMonth()) {
+                        maxDate = maxCal.getDate();
+                    }
+                }
+            }
+            else {
+                minYear = _b.minYear;
+                maxYear = _a.maxYear;
+                minMonth = _b.minMonth;
+                maxMonth = _a.maxMonth;
+                minDate = _b.minDate;
+                maxDate = _a.maxDate;
+            }
+            var minH = Math.max(minHour, data.minHour);
+            var maxH = Math.min(maxHour, data.maxHour);
+            var stepM = data.minuteStep > 1 ? data.minuteStep : 1;
+            if (stepM < 1) {
+                stepM = 1;
+            }
+            /** 选中「今天」时：下限 = max(业务最早可约, 此刻) 再按分钟步长向上取整，避免仍显示已过时分 */
+            var floorD = null;
+            if (data.type === 'datetime') {
+                var ivT = new Date(data.innerValue);
+                var nwT = new Date();
+                if (ivT.getFullYear() === nwT.getFullYear() &&
+                    ivT.getMonth() === nwT.getMonth() &&
+                    ivT.getDate() === nwT.getDate()) {
+                    var nwMs = nwT.getTime();
+                    var bizMs = data.sameDayEarliestMs != null && data.sameDayEarliestMs >= 0
+                        ? data.sameDayEarliestMs
+                        : 0;
+                    var rawFloor = Math.max(bizMs, nwMs);
+                    var stepMs = stepM * 60000;
+                    var floorMs = Math.ceil(rawFloor / stepMs) * stepMs;
+                    floorD = new Date(floorMs);
+                    minH = Math.max(minH, floorD.getHours());
+                }
+            }
+            if (minH > maxH) {
+                minH = maxH;
+            }
+            var minM = Math.max(minMinute, data.minMinute);
+            var maxM = Math.min(maxMinute, data.maxMinute);
+            if (minM > maxM) {
+                minM = maxM;
+            }
+            if (floorD != null && data.type === 'datetime') {
+                var ivM = new Date(data.innerValue);
+                if (ivM.getHours() === floorD.getHours()) {
+                    var fm = floorD.getMinutes();
+                    var fmAl = Math.ceil(fm / stepM) * stepM;
+                    if (fmAl > 59) {
+                        fmAl = 59;
+                    }
+                    minM = Math.max(minM, fmAl);
+                }
+            }
+            if (minM > maxM) {
+                minM = maxM;
+            }
+            if (stepM > 1) {
+                if (minM % stepM !== 0) {
+                    minM = Math.min(maxM, minM + (stepM - (minM % stepM)));
+                }
+                if (minM > maxM) {
+                    minM = maxM;
+                }
+            }
             var result = [
                 {
                     type: 'year',
@@ -178,11 +304,11 @@ var defaultFormatter = function (type, value) { return value; };
                 },
                 {
                     type: 'hour',
-                    range: [minHour, maxHour],
+                    range: [minH, maxH],
                 },
                 {
                     type: 'minute',
-                    range: [minMinute, maxMinute],
+                    range: [minM, maxM],
                 },
             ];
             if (data.type === 'date')
@@ -212,6 +338,51 @@ var defaultFormatter = function (type, value) { return value; };
             // date type
             value = Math.max(value, data.minDate);
             value = Math.min(value, data.maxDate);
+            if (data.type === 'datetime') {
+                var dvE = new Date(value);
+                var nwE = new Date();
+                if (dvE.getFullYear() === nwE.getFullYear() &&
+                    dvE.getMonth() === nwE.getMonth() &&
+                    dvE.getDate() === nwE.getDate()) {
+                    var stp = data.minuteStep > 1 ? data.minuteStep : 1;
+                    if (stp < 1) {
+                        stp = 1;
+                    }
+                    var stepMs2 = stp * 60000;
+                    var bizE = data.sameDayEarliestMs != null && data.sameDayEarliestMs >= 0
+                        ? data.sameDayEarliestMs
+                        : 0;
+                    var rawE = Math.max(bizE, nwE.getTime());
+                    var floorE = Math.ceil(rawE / stepMs2) * stepMs2;
+                    value = Math.max(value, floorE);
+                }
+            }
+            if (data.type === 'datetime' && data.minuteStep > 1) {
+                var dv = new Date(value);
+                var st = data.minuteStep;
+                var sm = dv.getMinutes();
+                dv.setMinutes(Math.floor(sm / st) * st, 0, 0);
+                value = dv.getTime();
+                if (data.type === 'datetime') {
+                    var dv2 = new Date(value);
+                    var nw2 = new Date();
+                    if (dv2.getFullYear() === nw2.getFullYear() &&
+                        dv2.getMonth() === nw2.getMonth() &&
+                        dv2.getDate() === nw2.getDate()) {
+                        var stp2 = data.minuteStep > 1 ? data.minuteStep : 1;
+                        if (stp2 < 1) {
+                            stp2 = 1;
+                        }
+                        var sms = stp2 * 60000;
+                        var biz2 = data.sameDayEarliestMs != null && data.sameDayEarliestMs >= 0
+                            ? data.sameDayEarliestMs
+                            : 0;
+                        var raw2 = Math.max(biz2, nw2.getTime());
+                        var fl2 = Math.ceil(raw2 / sms) * sms;
+                        value = Math.max(value, fl2);
+                    }
+                }
+            }
             return value;
         },
         getBoundary: function (type, innerValue) {

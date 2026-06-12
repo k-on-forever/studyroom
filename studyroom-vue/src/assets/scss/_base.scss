@@ -96,6 +96,15 @@ img {
     margin-right: 0;
     font-size: 20px;
   }
+  // 折叠时隐藏菜单文字，只保留图标
+  .el-menu-item span,
+  .el-submenu__title span {
+    display: none;
+  }
+  // 折叠时隐藏子菜单箭头
+  .el-submenu__title .el-submenu__icon-arrow {
+    display: none;
+  }
   .site-content--tabs > .el-tabs > .el-tabs__header {
     left: 64px;
   }
@@ -124,9 +133,40 @@ img {
   z-index: 1030;
   height: 50px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, .08);
-  background-color: $navbar--background-color;
+  background-color: #fff;
+
+  &__body {
+    background-color: transparent;
+  }
+  &__menu {
+    > .el-menu-item,
+    > .el-submenu > .el-submenu__title {
+      color: #303133;
+      &:focus,
+      &:hover {
+        color: $navbar--background-color;
+        background-color: mix(#000, #fff, 5%);
+      }
+    }
+    .el-menu-item i,
+    .el-submenu__title i,
+    .icon-svg {
+      color: #606266;
+    }
+    .site-navbar__avatar .el-dropdown-link {
+      color: #303133 !important;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      &:hover,
+      &:focus {
+        color: $navbar--background-color !important;
+      }
+    }
+  }
 
   &--inverse {
+    background-color: $navbar--background-color;
     .site-navbar__body {
       background-color: transparent;
     }
@@ -146,8 +186,28 @@ img {
       }
       .el-menu-item i,
       .el-submenu__title i,
-      .el-dropdown {
+      .el-dropdown,
+      .icon-svg {
         color: #fff;
+      }
+    }
+    .site-navbar__avatar .el-dropdown-link {
+      color: #fff !important;
+      font-weight: 600;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+      &:hover,
+      &:focus {
+        color: #fff !important;
+      }
+    }
+    .site-navbar__logout-btn {
+      color: rgba(255, 255, 255, 0.95) !important;
+      &:hover,
+      &:focus {
+        color: #fff !important;
+        background-color: mix(#000, $navbar--background-color, 12%) !important;
       }
     }
     .el-menu--popup-bottom-start {
@@ -161,6 +221,7 @@ img {
     width: 230px;
     height: 50px;
     overflow: hidden;
+    background-color: $sidebar--background-color-dark;
   }
   &__brand {
     display: table-cell;
@@ -210,17 +271,39 @@ img {
   }
   &__body {
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-left: 230px;
     padding-right: 15px;
-    background-color: #fff;
+    background-color: transparent;
+  }
+  &__actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+  &__logout-btn {
+    color: #606266 !important;
+    font-weight: 500;
+    padding: 8px 12px;
+    margin-left: 4px;
+    &:hover,
+    &:focus {
+      color: $navbar--background-color !important;
+      background-color: mix(#000, #fff, 5%) !important;
+    }
   }
   &__menu {
-    float: left;
     background-color: transparent;
     border-bottom: 0;
 
+    &--left {
+      flex: 1;
+      min-width: 0;
+    }
     &--right {
-      float: right;
+      float: none;
     }
     a:focus,
     a:hover {
@@ -265,10 +348,14 @@ img {
       .el-menu-item,
       .el-submenu > .el-submenu__title {
         color: $sidebar--color-text-dark;
+        font-weight: 500;
+        span {
+          color: inherit;
+        }
         &:focus,
         &:hover {
-          color: mix(#fff, $sidebar--color-text-dark, 50%);
-          background-color: mix(#fff, $sidebar--background-color-dark, 2.5%);
+          color: $sidebar--color-text-dark-active;
+          background-color: mix(#fff, $sidebar--background-color-dark, 8%);
         }
       }
       .el-menu,
@@ -277,7 +364,8 @@ img {
       }
       .el-menu-item.is-active,
       .el-submenu.is-active > .el-submenu__title {
-        color: mix(#fff, $sidebar--color-text-dark, 80%);
+        color: $sidebar--color-text-dark-active;
+        font-weight: 600;
       }
     }
   }

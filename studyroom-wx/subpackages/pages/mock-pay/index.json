@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "确认支付",
+  "usingComponents": {
+    "van-button": "/libs/vant-ui/button/index"
+  }
+}

@@ -1,11 +1,17 @@
+# 开发环境：异常返回中可带简要技术信息（仅本机 / 内网使用）
+study:
+  exception:
+    expose-detail: true
+
 spring:
     datasource:
         type: com.alibaba.druid.pool.DruidDataSource
         druid:
             driver-class-name: com.mysql.cj.jdbc.Driver
-            url: jdbc:mysql://localhost:3306/study-room?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
-            username: root
-            password: root
+            # connectTimeout/socketTimeout：毫秒，避免连不上库时卡很久才报错
+            url: ${SPRING_DATASOURCE_URL:jdbc:mysql://192.168.238.138:3306/study-room?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&connectTimeout=15000&socketTimeout=60000}
+            username: ${SPRING_DATASOURCE_USERNAME:root}
+            password: ${SPRING_DATASOURCE_PASSWORD:1234}
             initial-size: 10
             max-active: 100
             min-idle: 10

@@ -7,7 +7,9 @@ import com.selfstudy.modules.sys.entity.SysLogEntity;
 import com.selfstudy.modules.sys.entity.SysUserEntity;
 import com.selfstudy.modules.sys.service.SysLogService;
 import com.selfstudy.common.annotation.SysLog;
+import com.selfstudy.modules.sys.interceptor.SysAdminAuthInterceptor;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.UnavailableSecurityManagerException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,7 +18,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.Date;
 
@@ -24,7 +26,7 @@ import java.util.Date;
 /**
  * 系统日志，切面处理类
  *
- * @author Mark 2891517520@qq.com
+ * @author kon-foreverkon-forever
  */
 @Aspect
 @Component
@@ -81,8 +83,23 @@ public class SysLogAspect {
 		//设置IP地址
 		sysLog.setIp(IPUtils.getIpAddr(request));
 
-		//用户名
-		String username = ((SysUserEntity) SecurityUtils.getSubject().getPrincipal()).getUsername();
+		String username = "anonymous";
+		if (request != null) {
+			Object u = request.getAttribute(SysAdminAuthInterceptor.ADMIN_USERNAME_ATTR);
+			if (u != null && u.toString().length() > 0) {
+				username = u.toString();
+			}
+		}
+		if ("anonymous".equals(username)) {
+			try {
+				Object principal = SecurityUtils.getSubject().getPrincipal();
+				if (principal instanceof SysUserEntity) {
+					username = ((SysUserEntity) principal).getUsername();
+				}
+			} catch (UnavailableSecurityManagerException | ClassCastException ignored) {
+				// 小程序等场景未配置 Shiro SecurityManager
+			}
+		}
 		sysLog.setUsername(username);
 
 		sysLog.setTime(time);

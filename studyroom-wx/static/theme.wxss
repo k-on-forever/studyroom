@@ -1,0 +1,24 @@
+/**
+ * 自习室小程序全局视觉：与预定页 / 首页一致的浅蓝渐变与卡片阴影。
+ * 由 app.wxss 引入，可在任意页面的 WXSS 中直接使用下列 class。
+ */
+
+/* 标准页面底（Tab 子页、表单页） */
+.sr-bg-page {
+  background: linear-gradient(180deg, #e8f4ff 0%, #f6f8fc 38%, #f7f8fa 100%);
+}
+
+/* 浮起的白卡片 */
+.sr-card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 22rpx;
+  box-shadow: 0 8rpx 28rpx rgba(28, 143, 250, 0.09);
+  border: 1rpx solid rgba(28, 143, 250, 0.07);
+  box-sizing: border-box;
+}
+
+/* 弱阴影卡片（列表项） */
+.sr-card--soft {
+  box-shadow: 0 4rpx 18rpx rgba(15, 35, 95, 0.06);
+  border: 1rpx solid rgba(0, 0, 0, 0.04);
+}

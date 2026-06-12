@@ -9,7 +9,10 @@
   width: 100%;
 }
 .outermost-layer {
-  padding: 0 50rpx 0 50rpx;
+  min-height: 100vh;
+  padding: 0 40rpx calc(140rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #e8f4ff 0%, #f6f8fc 38%, #f7f8fa 100%);
 }
 .user-login {
   font-size: 60rpx;
@@ -70,10 +73,21 @@
 .van-field__control {
   font-size: 30rpx;
 }
-.icon-EyeInvisible, .icon-iconfontbukejian {
-  z-index: 99999;
-  bottom: 37rpx;
-  right: 33rpx;
+.pwd-eye {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72rpx;
+  height: 100%;
+  padding: 0 8rpx;
+}
+.pwd-eye__img {
+  width: 44rpx;
+  height: 44rpx;
+  display: block;
+}
+.pwd-eye--press {
+  opacity: 0.55;
 }
 
 /* 提示选项 */
@@ -96,4 +110,15 @@
 }
 .van-button--primary {
   border-radius: 100rpx !important;
+}
+
+.sms-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-right: 16rpx;
+}
+.sms-row .van-button {
+  flex-shrink: 0;
+  margin-left: 12rpx;
 }

@@ -1,104 +1,46 @@
-// subpackages/pages/announce/index.js
-import {
-  getAnnounceList,
-  getForbanList,
-  getMessageList
-} from "../../../api/announce"
-Page({
+const { getAnnounceList } = require("../../../api/announce");
 
-  /**
-   * 页面的初始数据
-   */
+Page({
   data: {
     dataList: [],
-    forbanList: [],
-    messageList: []
-  },
-  // 公告
-  getDataList() {
-    getAnnounceList().then((info) =>{
-      if (info.code == 0) {
-        this.setData({
-          dataList: info.data.content
-        })
-      }
-    })
-  },
-  getUserList() {
-    getForbanList().then((info) =>{
-      if (info.code == 0) {
-        this.setData({
-          forbanList: info.data
-        })
-      }
-    })
-  },
-  getLeavingList() {
-    getMessageList().then((info) =>{
-      if (info.code == 0) {
-        this.setData({
-          messageList: info.data
-        })
-      }
-    })
-  },
-  
-
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {
-    this.getDataList()
-    this.getUserList()
-    this.getLeavingList()
+    loading: true,
+    loadError: "",
   },
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady() {
-
+  onLoad() {
+    this.loadNotices();
   },
 
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide() {
-
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload() {
-
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
   onPullDownRefresh() {
-
+    this.loadNotices().finally(() => wx.stopPullDownRefresh());
   },
 
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom() {
-
+  loadNotices() {
+    this.setData({ loading: true, loadError: "" });
+    return getAnnounceList(1, 30, "")
+      .then((info) => {
+        if (info.code !== 0) {
+          this.setData({
+            loading: false,
+            loadError: info.msg || "加载失败",
+            dataList: [],
+          });
+          return;
+        }
+        const pr = info.data || {};
+        const list = pr.list || pr.content || pr.records || [];
+        this.setData({
+          loading: false,
+          dataList: Array.isArray(list) ? list : [],
+          loadError: "",
+        });
+      })
+      .catch(() => {
+        this.setData({
+          loading: false,
+          loadError: "网络异常，请检查后端与 baseUrl",
+          dataList: [],
+        });
+      });
   },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage() {
-
-  }
-})
+});

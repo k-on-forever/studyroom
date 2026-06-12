@@ -1,0 +1,138 @@
+.page-stats {
+  min-height: 100vh;
+  padding: 32rpx 28rpx 48rpx;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #e8f4ff 0%, #f6f8fc 38%, #f7f8fa 100%);
+}
+
+.stats-summary {
+  display: flex;
+  align-items: stretch;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 22rpx;
+  padding: 36rpx 24rpx;
+  box-shadow: 0 8rpx 28rpx rgba(28, 143, 250, 0.1);
+  border: 1rpx solid rgba(28, 143, 250, 0.07);
+}
+
+.stats-summary__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stats-summary__num {
+  font-size: 52rpx;
+  font-weight: 700;
+  color: #1c8ffa;
+  line-height: 1.2;
+}
+
+.stats-summary__unit {
+  font-size: 26rpx;
+  color: #323233;
+  margin-top: 8rpx;
+}
+
+.stats-summary__sub {
+  font-size: 22rpx;
+  color: #969799;
+  margin-top: 12rpx;
+}
+
+.stats-summary__divider {
+  width: 2rpx;
+  background: #ebedf0;
+  margin: 0 16rpx;
+}
+
+.heat-title {
+  margin: 36rpx 0 20rpx;
+  font-size: 28rpx;
+  color: #323233;
+  font-weight: 600;
+}
+
+.heat-wrap {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 22rpx;
+  padding: 24rpx;
+  box-shadow: 0 8rpx 28rpx rgba(28, 143, 250, 0.08);
+  border: 1rpx solid rgba(28, 143, 250, 0.06);
+}
+
+.heat-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8rpx;
+}
+
+.heat-cell {
+  height: 28rpx;
+  border-radius: 6rpx;
+}
+
+.heat-cell--0 {
+  background: #ebedf0;
+}
+.heat-cell--1 {
+  background: #c6e48b;
+}
+.heat-cell--2 {
+  background: #7bc96f;
+}
+.heat-cell--3 {
+  background: #239a3b;
+}
+.heat-cell--4 {
+  background: #196127;
+}
+
+.heat-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 20rpx;
+  gap: 12rpx;
+}
+
+.heat-legend__l {
+  font-size: 22rpx;
+  color: #969799;
+}
+
+.heat-legend__dots {
+  display: flex;
+  gap: 6rpx;
+  align-items: center;
+}
+
+.heat-chip {
+  width: 22rpx;
+  height: 22rpx;
+  border-radius: 4rpx;
+}
+
+.heat-chip--0 {
+  background: #ebedf0;
+}
+.heat-chip--1 {
+  background: #c6e48b;
+}
+.heat-chip--2 {
+  background: #7bc96f;
+}
+.heat-chip--3 {
+  background: #239a3b;
+}
+.heat-chip--4 {
+  background: #196127;
+}
+
+.heat-hint {
+  margin-top: 28rpx;
+  font-size: 24rpx;
+  color: #969799;
+  text-align: center;
+}

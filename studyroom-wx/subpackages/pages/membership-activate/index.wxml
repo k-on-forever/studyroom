@@ -1,0 +1,31 @@
+<view class="page">
+  <view class="card hero">
+    <view class="hero-t">{{ cardName || '会员卡' }}</view>
+    <block wx:if="{{ mode === 'modify' }}">
+      <view class="hero-d">修改后将从新日期 0 点起重新计算 {{ validityDays }} 天权益。</view>
+      <view class="hero-d hero-d--warn">每张卡最多修改 {{ changesLeft > 0 ? changesLeft : 0 }} 次（共 3 次，不含首次激活）。会员生效后不可再改。</view>
+    </block>
+    <block wx:else>
+      <view class="hero-d">支付成功。请选择生效日期（今天至 {{ maxDate }}，两年内），从当天 0 点起算 {{ validityDays }} 天会员权益。</view>
+      <view class="hero-d hero-d--sub">激活后若未生效，还可修改生效日最多 3 次。</view>
+    </block>
+    <view class="hero-d hero-d--sub">权益期内预约入座为 0 元。</view>
+  </view>
+
+  <view class="card picker-card">
+    <view class="label">生效日期</view>
+    <picker mode="date" value="{{ activateDate }}" start="{{ minDate }}" end="{{ maxDate }}" bindchange="onDateChange">
+      <view class="picker-val">{{ activateDate || '请选择日期' }}</view>
+    </picker>
+    <view class="preview" wx:if="{{ activateDate }}">
+      <text>预计权益：{{ activateDate }} 起，共 {{ validityDays }} 天（可选至 {{ maxDate }}）</text>
+    </view>
+  </view>
+
+  <view class="actions">
+    <van-button type="primary" color="#1C8FFA" block bindtap="onConfirm" loading="{{ submitting }}" disabled="{{ mode === 'modify' && changesLeft <= 0 }}">
+      {{ mode === 'modify' ? '确认修改' : '确认激活' }}
+    </van-button>
+    <van-button plain hairline block bindtap="onLater" custom-class="btn-later">稍后激活</van-button>
+  </view>
+</view>

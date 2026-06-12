@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 /**
  * 系统日志注解
  *
- * @author Mark 2891517520@qq.com
+ * @author kon-foreverkon-forever
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

@@ -1,0 +1,120 @@
+.page {
+  padding: 32rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #e8f4ff 0%, #f6f8fc 38%, #f7f8fa 100%);
+}
+.card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  margin-bottom: 28rpx;
+  box-shadow: 0 8rpx 28rpx rgba(28, 143, 250, 0.1);
+  border: 1rpx solid rgba(28, 143, 250, 0.07);
+}
+.order-card .order-line {
+  margin-top: 16rpx;
+  font-size: 28rpx;
+  color: #444;
+  line-height: 1.5;
+}
+.title {
+  font-size: 34rpx;
+  font-weight: 600;
+  color: #333;
+}
+.hint {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #888;
+  line-height: 1.5;
+}
+.amount {
+  margin-top: 36rpx;
+  font-size: 56rpx;
+  font-weight: 700;
+  color: #1c8ffa;
+}
+.sub {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.45;
+}
+.pay-list {
+  margin-top: 8rpx;
+}
+.pay-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx 32rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.06);
+  border: 2rpx solid rgba(28, 143, 250, 0.12);
+}
+.pay-item:active {
+  opacity: 0.88;
+}
+.pay-item--disabled {
+  opacity: 0.55;
+}
+.pay-item--hidden {
+  display: none;
+}
+.pay-item__main {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+.pay-item__icon {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 16rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+.pay-item__icon--card {
+  background: linear-gradient(135deg, #07c160, #06ad56);
+}
+.pay-item__icon--hour {
+  background: linear-gradient(135deg, #1989fa, #0d6efd);
+}
+.pay-item__icon--wx {
+  background: linear-gradient(135deg, #07c160, #2aae67);
+}
+.pay-item__icon--ali {
+  background: linear-gradient(135deg, #1677ff, #0958d9);
+}
+.pay-item__text {
+  margin-left: 24rpx;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.pay-item__name {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333;
+}
+.pay-item__desc {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: #888;
+}
+.pay-item__arrow {
+  font-size: 40rpx;
+  color: #ccc;
+  margin-left: 16rpx;
+}
+.btn-back {
+  margin-top: 24rpx;
+}

@@ -1,11 +1,18 @@
+@import "./static/theme.wxss";
+
+/* 勿用 height:100%，在部分机型上与 min-height 子节点组合会导致 Tab 页主区域高度为 0 */
 page {
-  height: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  background-color: #f7f8fa;
 }
 /* tab页面 */
 .outermost-layer-tab {
-  background: #F6F6F6;
-  height: 90%;
+  background: linear-gradient(180deg, #e8f4ff 0%, #f6f8fc 38%, #f7f8fa 100%);
+  min-height: 90vh;
   overflow: auto;
+  padding-bottom: calc(120rpx + env(safe-area-inset-bottom));
+  box-sizing: border-box;
 } 
 .centered {
   padding: 0 20rpx 0 20rpx;

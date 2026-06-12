@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * 多数据源注解
  *
- * @author Mark 2891517520@qq.com
+ * @author kon-foreverkon-forever
  */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

@@ -1,20 +1,94 @@
-# Tomcat
+# Tomcat（0.0.0.0：本机 localhost / 127.0.0.1 与局域网其它机器均可访问，端口见 server.port）
 server:
+  address: 0.0.0.0
   tomcat:
     uri-encoding: UTF-8
-    max-threads: 1000
-    min-spare-threads: 30
-  port: 8080
+    threads:
+      max: 1000
+      min-spare: 30
+  port: 8081
   servlet:
     context-path: /self-study
+
+# Redis 相关（需 spring.data.redis 可连）串联关系简述：
+# 1) study.seat-lock — SET NX 短时占位，在 BasAppointmentServiceImpl.appointment 中与下述编排同用，finally 释放
+# 2) study.reservation — Redisson RLock（座位+业务日）+ SeatBitmapRedisService（Lua）占/释时间槽
+# 3) UserCreditRedisService — 预约前 assertCanBook；未签到 PendingSignInScheduler 调 processNoShowIfNeeded 后扣罚分
+# 4) PendingCheckInRedisService + PendingSignInScheduler — ZSET 待签到截止时间，超时释放 Bitmap 并记爽约
+# 5) 管理端验证码 — 默认写 Redis；study.captcha.memory-fallback=true 时 Redis 不可用则自动用进程内缓存（开发环境可不启 Redis）
+study:
+  cors:
+    # 开发默认允许本机管理端；生产在 application-prod 中改为正式域名（勿使用 * + credentials）
+    allowed-origin-patterns:
+      - http://localhost:*
+      - http://127.0.0.1:*
+    allow-credentials: true
+  captcha:
+    # 开发环境推荐 true：Redis 连不上时验证码仍能生成。生产多节点部署请改为 false 并保证 Redis 可用。
+    memory-fallback: true
+  redis-utils-enabled: false
+  admin:
+    jwt:
+      # 与 applet.jwt 分离；生产务必设置环境变量 STUDY_ADMIN_JWT_SECRET
+      secret: ${STUDY_ADMIN_JWT_SECRET:f4e2e52034348f86b67cde581c0f9eb5}
+      expire: 604800
+      header: token
+  seat-lock:
+    enabled: true
+    ttl-seconds: 300
+  browse-lock:
+    enabled: false
+    ttl-seconds: 900
+  wx:
+    pay:
+      # mock：演示标记支付；wx：真实微信支付（须配置商户号、证书、notify-url）
+      mode: ${STUDY_WX_PAY_MODE:mock}
+      mch-id: ${STUDY_WX_PAY_MCH_ID:}
+      api-v3-key: ${STUDY_WX_PAY_API_V3_KEY:}
+      private-key-path: ${STUDY_WX_PAY_PRIVATE_KEY_PATH:}
+      merchant-serial-number: ${STUDY_WX_PAY_SERIAL:}
+      notify-url: ${STUDY_WX_PAY_NOTIFY_URL:}
+  message:
+    form-save-error: 保存失败
+    form-update-error: 更新失败
+    user-account-exist: 账号或密码错误
+  reservation:
+    # 预约时段粒度（分钟）：5/30/60；与座位 Redis 位图一致；非会员单价 mini.per-slot-price-yuan 按「元/小时」折算
+    slot-minutes: 10
+    day-start: "08:00"
+    day-end: "22:30"
+    sign-in-grace-minutes: 15
+    # 商户模式：不拦预约、不扣信誉分；未签到仅自动释放座位并记「已取消」
+    credit-enabled: false
+    no-show-penalty-enabled: false
+    min-credit-score: 60
+    no-show-penalty: 10
+    initial-credit-score: 100
+    lock-wait-seconds: 5
+    lock-lease-seconds: 10
+    scheduler-enabled: true
+    scheduler-ms: 10000
+    # 预约结束时刻自动释放：使用中→已完成，待签到→已取消
+    auto-end-on-slot-finish: true
+    # 门店授权（白名单专属）预约：不按开场+宽限期提前释放，仅到期释放
+    skip-no-show-for-store-auth: true
+  mini:
+    # 非会员：元/小时 = 单价 ×（槽数×槽宽/60）；此处 6 即 6 元/小时
+    per-slot-price-yuan: 6
+    # 期限卡生效日可选范围：今天起至 N 年内（小程序日期选择器与后端校验一致）
+    membership-max-activate-years: 2
+  # 头像等本地上传（相对路径相对 user.dir）；生产可改为绝对路径或挂载目录
+  upload:
+    avatar-dir: data/upload/avatar
+  # 全局异常：开发可 true 便于排障；生产必须为 false，避免对外泄露异常细节
+  exception:
+    expose-detail: false
 
 spring:
   main:
     allow-circular-references: true
-  # 环境 dev|test|prod
   profiles:
     active: dev
-  # jackson时间格式化
   jackson:
     locale: zh_CN
     time-zone: GMT+8
@@ -24,65 +98,54 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
       enabled: true
-  redis:
-    open: false  # 是否开启redis缓存  true开启   false关闭
-    database: 0
-    host: localhost
-    port: 6379
-    password:    # 密码（默认为空）
-    timeout: 6000ms  # 连接超时时长（毫秒）
-    jedis:
-      pool:
-        max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
-        max-wait: -1ms      # 连接池最大阻塞等待时间（使用负值表示没有限制）
-        max-idle: 10      # 连接池中的最大空闲连接
-        min-idle: 5       # 连接池中的最小空闲连接
-  mvc:
-    throw-exception-if-no-handler-found: true
-    pathmatch:
-      matching-strategy: ANT_PATH_MATCHER
-#  resources:
-#    add-mappings: false
+  data:
+    redis:
+      database: 0
+      host: ${SPRING_DATA_REDIS_HOST:192.168.238.138}
+      port: ${SPRING_DATA_REDIS_PORT:6379}
+      password: ${SPRING_DATA_REDIS_PASSWORD:123321}
+      timeout: 6000ms
+      lettuce:
+        pool:
+          max-active: 1000
+          max-wait: -1ms
+          max-idle: 10
+          min-idle: 5
 
-#mybatis
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
-  #实体扫描，多个package用逗号或者分号分隔
   typeAliasesPackage: com.selfstudy.modules.*.entity
   global-config:
-    #数据库相关配置
     db-config:
-      #主键类型  AUTO:"数据库ID自增", INPUT:"用户输入ID", ID_WORKER:"全局唯一ID (数字类型唯一ID)", UUID:"全局唯一ID UUID";
       id-type: AUTO
       logic-delete-value: 1
       logic-not-delete-value: 0
     banner: false
-  #原生配置
   configuration:
     map-underscore-to-camel-case: true
     cache-enabled: false
     call-setters-on-nulls: true
     jdbc-type-for-null: 'null'
-# PageHelper分页插件
-  pagehelper:
-    helperDialect: mysql
-    supportMethodsArguments: true
-    params: count=countSql
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: ${SPRINGDOC_API_DOCS_ENABLED:true}
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: ${SPRINGDOC_SWAGGER_UI_ENABLED:true}
+    # 与 context-path 组合后：/self-study/swagger-ui/index.html
+    use-root-path: false
 
 applet:
   redis:
     open: false
   shiro:
     redis: false
-  # APP模块，是通过jwt认证的，如果要使用APP模块，则需要修改
   jwt:
-    # 加密秘钥
-    secret: f4e2e52034348f86b67cde581c0f9eb5
-    # token有效时长，7天，单位秒
+    secret: ${APPLET_JWT_SECRET:f4e2e52034348f86b67cde581c0f9eb5}
     expire: 604800
     header: token
-
-
   wechat:
     appid: 你的APPID
     secret: 你的秘钥

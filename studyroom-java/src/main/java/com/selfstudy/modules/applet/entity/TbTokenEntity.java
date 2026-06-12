@@ -12,7 +12,7 @@ import lombok.Data;
 /**
  * 小程序用户Token
  * 
- * @author 
+ * @author kon-forever
  * @email 2891517520@qq.com
  * @date 2023-01-31 14:21:07
  */

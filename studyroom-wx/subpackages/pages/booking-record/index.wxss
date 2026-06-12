@@ -1,0 +1,52 @@
+.br-page {
+  min-height: 100vh;
+  padding: 24rpx 28rpx 48rpx;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #f8fafc 0%, #f0f4f8 40%, #fff 100%);
+}
+.br-hint {
+  font-size: 24rpx;
+  color: #7a8699;
+  margin-bottom: 20rpx;
+  padding: 0 4rpx;
+}
+.br-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+.br-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 26rpx 28rpx;
+  box-shadow: 0 8rpx 28rpx rgba(15, 35, 95, 0.06);
+  border: 1rpx solid rgba(0, 0, 0, 0.04);
+}
+.br-card__top {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+.br-card__state {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #1c8ffa;
+}
+.br-card__date {
+  font-size: 24rpx;
+  color: #999;
+}
+.br-card__loc {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.45;
+}
+.br-card__time {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: #666;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}

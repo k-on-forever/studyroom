@@ -1,0 +1,69 @@
+<view class="page">
+  <view class="status card">
+    <view class="label">当前状态</view>
+    <view class="value">{{ activeText }}</view>
+    <view class="sub" wx:if="{{ validFromText }}">生效自：{{ validFromText }}</view>
+    <view class="sub" wx:if="{{ validToText }}">到期时间：{{ validToText }}</view>
+  </view>
+
+  <view class="sec-title" wx:if="{{ pending.length }}">待激活</view>
+  <view wx:for="{{ pending }}" wx:key="id" class="card order order--pending">
+    <view class="row">
+      <text>{{ item.cardName }}</text>
+      <text class="tag wait">待激活</text>
+    </view>
+    <view class="meta">共 {{ item.validityDays || 30 }} 天权益 · 生效日可选两年内</view>
+    <van-button
+      size="small"
+      type="primary"
+      color="#1C8FFA"
+      custom-class="act-btn"
+      data-id="{{ item.id }}"
+      data-name="{{ item.cardName }}"
+      data-days="{{ item.validityDays }}"
+      bindtap="goActivate"
+    >去激活</van-button>
+  </view>
+
+  <view class="sec-title">购买记录</view>
+  <view wx:for="{{ orders }}" wx:key="id" class="card order">
+    <view class="row">
+      <text>{{ item.cardName }}</text>
+      <text class="tag {{ item.statusTag === '生效中' ? 'ok' : item.statusTag === '待激活' ? 'wait' : item.payStatus === 1 ? 'ok' : 'wait' }}">{{ item.statusTag }}</text>
+    </view>
+    <view class="meta">订单号 {{ item.orderNo }}</view>
+    <view class="meta">金额 ¥{{ item.amountYuan }}</view>
+    <view class="meta" wx:if="{{ item.validFrom }}">生效 {{ item.validFrom }}</view>
+    <view class="meta" wx:if="{{ item.validTo }}">有效期至 {{ item.validTo }}</view>
+    <view class="meta" wx:if="{{ item._scheduled }}">已修改 {{ item.activateChangeCount }} 次，还可改 {{ item.activateChangesLeft }} 次</view>
+    <van-button
+      wx:if="{{ item._canModify }}"
+      size="small"
+      plain
+      hairline
+      custom-class="act-btn"
+      data-id="{{ item.id }}"
+      data-name="{{ item.cardName }}"
+      data-days="{{ item.validityDays }}"
+      data-mode="modify"
+      data-date="{{ item.validFromDate }}"
+      data-left="{{ item.activateChangesLeft }}"
+      bindtap="goActivate"
+    >修改生效日</van-button>
+    <van-button
+      wx:if="{{ item._pendingAct }}"
+      size="small"
+      type="primary"
+      color="#1C8FFA"
+      custom-class="act-btn"
+      data-id="{{ item.id }}"
+      data-name="{{ item.cardName }}"
+      data-days="{{ item.validityDays }}"
+      bindtap="goActivate"
+    >去激活</van-button>
+  </view>
+  <van-empty wx:if="{{ loaded && orders.length === 0 }}" description="暂无订单" />
+  <view class="foot">
+    <navigator url="/subpackages/pages/membership-buy/index" open-type="navigate">购买会员卡 / 续费</navigator>
+  </view>
+</view>

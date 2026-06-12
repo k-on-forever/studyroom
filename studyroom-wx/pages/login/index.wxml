@@ -1,0 +1,59 @@
+<view class="page-login">
+  <view class="login-brand">
+    <text class="login-brand__t">自习室</text>
+    <text class="login-brand__s">帐号登录</text>
+  </view>
+  <view wx:if="{{ loggedIn }}" class="form logged">
+    <text class="logged-tip">本机已保存登录状态，可直接使用预约、入座等功能。</text>
+    <button class="submit" bindtap="onBack">返回上一页</button>
+    <button class="submit submit--ghost" bindtap="onLogout">退出登录</button>
+    <view class="link link-row">
+      <text bindtap="goRegister">注册新帐号（需先退出）</text>
+    </view>
+  </view>
+  <view wx:else class="form">
+    <view class="field">
+      <text class="label">帐号</text>
+      <input class="input" value="{{ account }}" data-field="account" bindinput="onField" placeholder="请输入帐号" />
+    </view>
+    <view class="field">
+      <text class="label">密码</text>
+      <view class="input-wrap">
+        <input
+          wx:if="{{ !showPassword }}"
+          class="input input--pwd"
+          type="text"
+          password
+          value="{{ password }}"
+          data-field="password"
+          bindinput="onField"
+          placeholder="请输入密码"
+          confirm-type="done"
+        />
+        <input
+          wx:else
+          class="input input--pwd"
+          type="text"
+          value="{{ password }}"
+          data-field="password"
+          bindinput="onField"
+          placeholder="请输入密码"
+          confirm-type="done"
+        />
+        <view class="pwd-eye" bindtap="toggleShowPassword" hover-class="pwd-eye--press">
+          <image
+            class="pwd-eye__img"
+            src="{{ showPassword ? '/static/icons/eye-hide.svg' : '/static/icons/eye-show.svg' }}"
+            mode="aspectFit"
+          />
+        </view>
+      </view>
+    </view>
+    <button class="submit" bindtap="onLogin">登录</button>
+    <view class="link link-row">
+      <text bindtap="goForgot">忘记密码</text>
+      <text class="link-gap">·</text>
+      <text bindtap="goRegister">注册帐号</text>
+    </view>
+  </view>
+</view>

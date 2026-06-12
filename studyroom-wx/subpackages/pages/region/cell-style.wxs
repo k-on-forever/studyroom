@@ -1,0 +1,26 @@
+/**
+ * 平面图格子 class（正式预约 / 时段策略 / 管理员锁座）
+ */
+function megaCell(cell, selSid) {
+  if (cell.ghost) {
+    return 'seat-mega__cell seat-mega__cell--ghost';
+  }
+  if (cell.appointmentBooked) {
+    return 'seat-mega__cell seat-mega__cell--occ';
+  }
+  var adminOcc = cell.locked == 1 || cell.roomState == '1';
+  if (adminOcc) {
+    return 'seat-mega__cell seat-mega__cell--occ';
+  }
+  if (cell.ruleBlocked) {
+    return 'seat-mega__cell seat-mega__cell--browse';
+  }
+  if (selSid == cell.sid) {
+    return 'seat-mega__cell seat-mega__cell--sel';
+  }
+  return 'seat-mega__cell seat-mega__cell--free';
+}
+
+module.exports = {
+  megaCell: megaCell,
+};

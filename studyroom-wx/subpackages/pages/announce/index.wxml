@@ -1,9 +1,16 @@
-<view class="section outermost-layer-tab">
-  <view class="header centered" wx:for="{{dataList}}" wx:key="*this">
-    <view class="header_title">{{ item.noticeTitle }}</view>
-    <view class="header_content">
-      {{ item.noticeContent }}
-      <span class="header_time">{{item.createTime}}</span>
+<view class="page-announce outermost-layer-tab">
+  <view class="announce-head">公告中心</view>
+  <view class="announce-tip">门店通知与活动说明</view>
+
+  <view wx:if="{{ loading }}" class="announce-empty">加载中…</view>
+  <view wx:elif="{{ loadError }}" class="announce-empty announce-empty--err">{{ loadError }}</view>
+  <view wx:elif="{{ !dataList.length }}" class="announce-empty">暂无公告</view>
+
+  <view wx:else class="announce-list">
+    <view class="announce-card" wx:for="{{ dataList }}" wx:key="id">
+      <view class="announce-card__title">{{ item.title }}</view>
+      <view class="announce-card__time" wx:if="{{ item.createTime }}">{{ item.createTime }}</view>
+      <view class="announce-card__body">{{ item.content }}</view>
     </view>
   </view>
 </view>

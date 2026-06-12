@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "订座记录",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "van-empty": "/libs/vant-ui/empty/index"
+  }
+}

@@ -1,46 +1,120 @@
-<view class="outermost-layer-tab">
-  <!-- <view class="centered header_title">预约信息</view> -->
-  <van-empty description="暂无预约" wx:if="{{ makeFlag }}"/>
-  <view class="centered make" wx:else>
-    <view class="make_centered" wx:for="{{ dataList }}" wx:key="*this">
-        <view class="make_hader">
-          <span style="color: #1C8FFA; font-size: 24rpx;">
-            {{ item.seatState == '1' ? '未审核' : item.seatState == '0' ? '审核通过' : '审核未通过' }}
-          </span>
-        </view>
-        <view class="make_section">
-          <view class="make_fromName">
-            <span>姓名：</span>
-            <span style="color: #9b9b9b;">{{item.seatName}}</span>
-          </view>
-          <view class="make_fromPhone">
-            <span>电话：</span>
-            <span style="color: #9b9b9b;">{{item.seatPhone}}</span>
-          </view>
-          <view class="make_fromClass">
-            <span>专业班级：</span>
-            <span style="color: #9b9b9b;">{{item.seatClass}}</span>
-          </view>
-          <view class="make_fromPhone">
-            <span>预约位置：</span>
-            <span class="make_tag city">{{item.floor}}</span>
-            <span class="make_tag room">{{item.roomName}}</span>
-            <span class="make_tag seat">{{item.sname}}座</span>
-          </view>
-          <view class="make_fromTime">
-            <span style="color: #ff9898;">Time：</span>
-            <span style="color: #9b9b9b;">{{item.seatDay}}</span>
-          </view>
-          <view class="make_item">
-            <span bindtap="onApply" data-item="{{ item }}">
-              {{ item.seatState == '1' ? '取消预约' : item.seatState == '0' ? '结束学习' : '取消预约' }}
-            </span>
-          </view>
-        </view>
+<view class="page-app outermost-layer-tab page-seat-entry">
+  <view class="seat-entry__hero">
+    <text class="seat-entry__hero-t">自习室入座</text>
+    <text class="seat-entry__hero-d">今日及以后的预约 · 签到 / 签退 · 到点自动结束</text>
+  </view>
+
+  <view class="store-auth sr-card" wx:if="{{ hasToken && storeAuthRules.length }}">
+    <view class="store-auth__title">门店授权可订</view>
+    <text class="store-auth__sub">登录手机 {{ storeAuthMobile }} · 以下时段专属可订（非选座占位）</text>
+    <view class="store-auth__item" wx:for="{{ storeAuthRules }}" wx:key="index">
+      <text class="store-auth__place">{{ item.place }}</text>
+      <text class="store-auth__when">{{ item.when }}</text>
+      <text class="store-auth__remark" wx:if="{{ item.remark }}">{{ item.remark }}</text>
     </view>
   </view>
-  <view class="cancel">
-    <van-dialog id="van-dialog" />
+
+  <view class="guide sr-card" wx:if="{{ showGuide }}">
+    <view class="guide-title">开始使用</view>
+    <view class="step">
+      <text class="step-no">1</text>
+      <view class="step-body">
+        <text class="step-t">注册 / 登录</text>
+        <text class="step-d">使用手机号注册；短信验证码为模拟（见后端日志）。</text>
+        <view class="step-actions">
+          <van-button wx:if="{{ !hasToken }}" size="small" type="primary" color="#1C8FFA" bindtap="goLogin">去登录</van-button>
+          <van-button wx:if="{{ !hasToken }}" size="small" plain hairline bindtap="goRegister">注册帐号</van-button>
+          <text wx:if="{{ hasToken }}" class="step-ok">已登录</text>
+        </view>
+      </view>
+    </view>
+    <view class="step">
+      <text class="step-no">2</text>
+      <view class="step-body">
+        <text class="step-t">会员卡（可选）</text>
+        <text class="step-d">购卡后需在「我的会员」选择生效日激活；有效期内预约 0 元入座。</text>
+        <view class="step-actions">
+          <van-button size="small" type="primary" color="#1C8FFA" bindtap="goMembershipBuy">购买会员卡</van-button>
+          <van-button size="small" plain hairline bindtap="goMembershipMine">我的会员</van-button>
+        </view>
+      </view>
+    </view>
+    <view class="step">
+      <text class="step-no">3</text>
+      <view class="step-body">
+        <text class="step-t">选座并预定</text>
+        <text class="step-d">在首页选好座位与时段后点「立即预定」，支付完成后在本页签到、签退。</text>
+        <view class="step-actions">
+          <van-button size="small" type="primary" color="#1C8FFA" bindtap="goHomeReserve">去首页选座</van-button>
+        </view>
+      </view>
+    </view>
   </view>
+
+  <block wx:if="{{ hasToken }}">
+    <block wx:if="{{ makeFlag }}">
+      <van-empty description="{{ emptyText }}" />
+      <view class="retry-wrap" wx:if="{{ showRetry }}">
+        <van-button size="small" type="primary" color="#1C8FFA" bindtap="geDataList">重试加载</van-button>
+      </view>
+    </block>
+    <block wx:elif="{{ listEmpty }}">
+      <van-empty description="暂无待签到或使用中的预约" />
+      <view class="retry-wrap">
+        <van-button size="small" plain hairline bindtap="goBookingRecord">查看全部订座记录</van-button>
+      </view>
+    </block>
+    <view class="order-list" wx:else>
+      <view class="order-sub">{{ listHint }}</view>
+      <view class="order-card sr-card" wx:for="{{ dataList }}" wx:key="id">
+        <view class="order-card__row order-card__row--store">
+          <text class="order-card__ico">⌂</text>
+          <text class="order-card__txt">{{ item.floor || '门店' }}</text>
+        </view>
+        <view class="order-card__row order-card__row--seat">
+          <text class="order-card__ico">▣</text>
+          <text class="order-card__txt">{{ item.roomName || '自习室' }} · {{ item.sname || '座位' }}</text>
+        </view>
+        <view class="order-card__row order-card__row--status">
+          <text class="order-card__ico">◷</text>
+          <view class="order-card__status-block">
+            <text class="order-card__status">{{ item.stateText }}</text>
+            <text class="order-card__time">{{ item.seatDayDisplay }}</text>
+            <text class="order-card__date-tag" wx:if="{{ item.bizDate }}">{{ item.bizDate }}</text>
+          </view>
+        </view>
+        <view class="order-card__pay" wx:if="{{ item.payLabel }}">
+          <text>计费 </text>
+          <text class="order-card__pay-strong">{{ item.payLabel }}</text>
+        </view>
+        <view class="order-card__dash" />
+        <view class="order-card__actions">
+          <block wx:if="{{ item.seatState == 0 }}">
+            <view
+              class="order-act {{ item.canSignIn ? '' : 'order-act--disabled' }}"
+              catchtap="onSignIn"
+              data-item="{{ item }}"
+            >
+              <view class="order-act__circle {{ item.canSignIn ? '' : 'order-act__circle--plain' }}">签</view>
+              <text class="order-act__lbl">{{ item.canSignIn ? '签到' : item.signInHint }}</text>
+            </view>
+            <view class="order-act" catchtap="onCancelBook" data-item="{{ item }}">
+              <view class="order-act__circle order-act__circle--plain">取</view>
+              <text class="order-act__lbl">取消</text>
+            </view>
+          </block>
+          <block wx:elif="{{ item.canOver }}">
+            <view class="order-act" catchtap="onOverStudy" data-item="{{ item }}">
+              <view class="order-act__circle">退</view>
+              <text class="order-act__lbl">签退</text>
+            </view>
+          </block>
+          <view class="order-act" catchtap="goBookingDetail" data-id="{{ item.id }}">
+            <view class="order-act__circle order-act__circle--plain">详</view>
+            <text class="order-act__lbl">详情</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
 </view>
-  

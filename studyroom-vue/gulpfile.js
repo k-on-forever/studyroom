@@ -20,8 +20,15 @@ var env         = process.env.npm_config_qa ? 'qa' : process.env.npm_config_uat 
   versionPath = distPath + '/' + version;
 })();
 
-// 编译
-gulp.task('build', $.shell.task([ 'node build/build.js' ]));
+// 编译（直接调 node，避免 gulp-shell 在 Node 22 下 lodash.template 报错）
+gulp.task('build', function (done) {
+  var exec = require('child_process').exec;
+  exec('node build/build.js', { maxBuffer: 10 * 1024 * 1024 }, function (err, stdout, stderr) {
+    if (stdout) process.stdout.write(stdout);
+    if (stderr) process.stderr.write(stderr);
+    done(err);
+  });
+});
 
 // 创建版本号目录
 gulp.task('create:versionCatalog', function () {

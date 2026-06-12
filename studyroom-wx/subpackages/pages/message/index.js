@@ -1,5 +1,5 @@
-import { addMessage } from "../../../api/message"
-import pages from "../../../pages";
+const { addMessage } = require("../../../api/message");
+const pages = require("../../../pages/index.js");
 // subpackages/pages/message/index.js
 Page({
 
@@ -17,39 +17,30 @@ Page({
       }
     ],
     choiceIndex: 0,
+    wordCount: 0,
     min: 0,
     max: 150,
     phoneValue: '',
     dataFrom: {
-      messageType: "0",
+      messageType: 0,
       message: ""
     }
   },
   handChoice(row) {
-    console.log(row.target.dataset.index)
+    const idx = Number(row.currentTarget.dataset.index) || 0;
     this.setData({
-      choiceIndex: row.target.dataset.index,
-      "dataFrom.messageType": row.target.dataset.index
-    })
-  },
-  inputeExplain(e) {
-    var value = e.detail.value;
-    this.setData({
-      "dataFrom.message": e.detail.value
-    })
-    let dataset = e.currentTarget.dataset;
-    this.data[dataset.obj] = value;
-    var len = parseInt(value.length);
-    if (len > this.data.maxAddr) return;
-    this.setData({
-      currentWordNumber: len,
+      choiceIndex: idx,
+      "dataFrom.messageType": idx,
     });
-    if (this.data.currentWordNumber == 150) {
-      wx.showModal({
-        title: "提示",
-        content: "您输入的次数已达上限",
-      });
-    }
+  },
+  onMessageInput(e) {
+    const v = (e.detail && e.detail.value) || "";
+    const max = this.data.max;
+    const slice = v.length > max ? v.slice(0, max) : v;
+    this.setData({
+      "dataFrom.message": slice,
+      wordCount: slice.length,
+    });
   },
   // 提交
   regionCheck() {
@@ -61,20 +52,35 @@ Page({
       });
       return false
     }
-    addMessage(this.data.dataFrom).then((info) =>{
-      if (info.code == 0) {
-        wx.showToast({
-          title: '留言成功',
-          icon: 'success',
-          duration: 1500
-        })
-        setTimeout(() => {
-          wx.switchTab({
-            url: pages.My,
+    addMessage(this.data.dataFrom)
+      .then((info) => {
+        if (info.code == 0) {
+          wx.showToast({
+            title: '留言成功',
+            icon: 'success',
+            duration: 1500
+          })
+          setTimeout(() => {
+            wx.switchTab({
+              url: pages.My,
+            });
+          }, 500);
+        } else if (info.code === 401) {
+          wx.showModal({
+            title: "提示",
+            content: info.msg || "请先登录",
+            confirmText: "去登录",
+            success: (r) => {
+              if (r.confirm) wx.navigateTo({ url: pages.Login });
+            },
           });
-        }, 500);
-      }
-    })
+        } else {
+          wx.showToast({ title: (info && info.msg) || "提交失败", icon: "none" });
+        }
+      })
+      .catch(() => {
+        wx.showToast({ title: "网络异常", icon: "none" });
+      });
   },
   /**
    * 生命周期函数--监听页面加载

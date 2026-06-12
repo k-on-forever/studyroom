@@ -1,0 +1,76 @@
+<view class="outermost-layer">
+  <view class="login-background-text">
+    <view class="login-box">
+      <view class="user-login">
+        重置密码
+        <view class="before"></view>
+      </view>
+      <view class="login-explain">已注册手机号 · 短信验证码（模拟）· 新密码</view>
+    </view>
+  </view>
+
+  <view class="register-from">
+    <view class="register-from-class">
+      <van-cell-group>
+        <van-field
+          value="{{ form.account }}"
+          placeholder="11 位手机号"
+          type="number"
+          maxlength="11"
+          border="{{ true }}"
+          bind:input="onAccount"
+        />
+        <view class="sms-row">
+          <van-field
+            value="{{ form.smsCode }}"
+            placeholder="验证码"
+            border="{{ true }}"
+            bind:input="onSms"
+          />
+          <van-button
+            size="small"
+            type="primary"
+            color="#1C8FFA"
+            disabled="{{ smsSeconds > 0 }}"
+            bindtap="onSendSms"
+          >{{ smsBtnText }}</van-button>
+        </view>
+        <van-field
+          value="{{ form.password }}"
+          placeholder="新登录密码"
+          border="{{ true }}"
+          type="text"
+          password="{{ !showPassword }}"
+          bind:input="onPassword"
+        >
+          <view slot="right-icon" class="pwd-eye" catch:tap="toggleShowPassword" hover-class="pwd-eye--press">
+            <image
+              class="pwd-eye__img"
+              src="{{ showPassword ? '/static/icons/eye-hide.svg' : '/static/icons/eye-show.svg' }}"
+              mode="aspectFit"
+            />
+          </view>
+        </van-field>
+        <van-field
+          value="{{ form.confirmPassword }}"
+          placeholder="再次输入新密码"
+          border="{{ true }}"
+          type="text"
+          password="{{ !showConfirmPassword }}"
+          bind:input="onConfirmPassword"
+        >
+          <view slot="right-icon" class="pwd-eye" catch:tap="toggleShowConfirmPassword" hover-class="pwd-eye--press">
+            <image
+              class="pwd-eye__img"
+              src="{{ showConfirmPassword ? '/static/icons/eye-hide.svg' : '/static/icons/eye-show.svg' }}"
+              mode="aspectFit"
+            />
+          </view>
+        </van-field>
+      </van-cell-group>
+    </view>
+    <view class="register-button">
+      <van-button type="primary" color="#1C8FFA" block bindtap="onSubmit">确认重置</van-button>
+    </view>
+  </view>
+</view>

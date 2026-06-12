@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "我的会员",
+  "usingComponents": {
+    "van-button": "/libs/vant-ui/button/index",
+    "van-empty": "/libs/vant-ui/empty/index"
+  }
+}

@@ -1,0 +1,82 @@
+<view class="page">
+  <block wx:if="{{ scene === 'mship' }}">
+    <view class="card">
+      <view class="title">模拟收银台</view>
+      <view class="hint" wx:if="{{ mockPayAllowed }}">演示模式：确认即视为支付成功。</view>
+      <view class="hint" wx:else>将调起微信支付（需微信登录获取 openid）。</view>
+      <view class="amount">¥ {{ displayAmount }}</view>
+      <view class="sub">购买会员卡</view>
+    </view>
+    <van-button type="primary" color="#1C8FFA" block bindtap="onConfirmPay">{{ mockPayAllowed ? '确认支付（演示）' : '微信支付' }}</van-button>
+    <van-button plain hairline block class="btn-back" bindtap="onCancel">取消</van-button>
+  </block>
+
+  <block wx:else>
+    <view class="card order-card" wx:if="{{ orderSummary }}">
+      <view class="title">预约信息</view>
+      <view class="order-line">座位：{{ orderSummary.seatLabel }}</view>
+      <view class="order-line">时段：{{ orderSummary.seatDayDisplay }}</view>
+    </view>
+
+    <view class="card">
+      <view class="title">确认支付</view>
+      <view class="hint">提交前将重新校验座位是否仍可预约。</view>
+      <view class="amount">¥ {{ displayAmount }}</view>
+      <view class="sub" wx:if="{{ quoteLoading }}">正在询价…</view>
+      <view class="sub" wx:elif="{{ quote }}">
+        <text wx:if="{{ quote.memberFree }}">您已开通会员卡，可使用会员卡 0 元预约。</text>
+        <text wx:elif="{{ quote.amountYuan > 0 }}">请使用微信支付完成预约。</text>
+        <text wx:else>本次无需支付，可使用会员卡提交。</text>
+      </view>
+    </view>
+
+    <view class="pay-list" wx:if="{{ !quoteLoading && quote }}">
+      <view
+        class="pay-item {{ quote.memberFree ? '' : 'pay-item--disabled' }}"
+        bindtap="onPayWithMembership"
+      >
+        <view class="pay-item__main">
+          <text class="pay-item__icon pay-item__icon--card">卡</text>
+          <view class="pay-item__text">
+            <text class="pay-item__name">会员卡支付</text>
+            <text class="pay-item__desc" wx:if="{{ quote.memberFree }}">有效期内本次 0 元</text>
+            <text class="pay-item__desc" wx:else>需先购买并激活会员卡</text>
+          </view>
+        </view>
+        <text class="pay-item__arrow">›</text>
+      </view>
+
+      <view
+        class="pay-item {{ canCashPay ? '' : 'pay-item--disabled' }}"
+        bindtap="onSimulateWechat"
+      >
+        <view class="pay-item__main">
+          <text class="pay-item__icon pay-item__icon--wx">微</text>
+          <view class="pay-item__text">
+            <text class="pay-item__name">微信支付</text>
+            <text class="pay-item__desc" wx:if="{{ canCashPay && mockPayAllowed }}">演示环境：标记已付后提交</text>
+            <text class="pay-item__desc" wx:elif="{{ canCashPay }}">调起微信支付</text>
+            <text class="pay-item__desc" wx:else>本单无需现金支付</text>
+          </view>
+        </view>
+        <text class="pay-item__arrow">›</text>
+      </view>
+
+      <van-button
+        wx:if="{{ quote && !quote.memberFree && !(quote.amountYuan > 0) }}"
+        type="primary"
+        color="#1C8FFA"
+        block
+        class="btn-gap"
+        bindtap="onSubmitZero"
+      >确认预约（0 元）</van-button>
+
+      <van-button plain hairline block class="btn-back" bindtap="onCancel">返回修改预约</van-button>
+    </view>
+
+    <view class="pay-list" wx:if="{{ !quoteLoading && !quote }}">
+      <van-button type="primary" color="#1C8FFA" block bindtap="refreshQuote">重新询价</van-button>
+      <van-button plain hairline block class="btn-back" bindtap="onCancel">返回</van-button>
+    </view>
+  </block>
+</view>

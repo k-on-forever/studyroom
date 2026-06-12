@@ -1,0 +1,65 @@
+<view class="page-home">
+  <view class="hero">
+    <text class="hero__title">自习室预约</text>
+    <text class="hero__sub">选择楼层 · 自习室 · 座位与时段</text>
+  </view>
+
+  <view class="home-swiper-wrap" wx:if="{{ bannerUrls.length }}">
+    <swiper
+      class="home-swiper"
+      indicator-dots="{{ true }}"
+      indicator-color="rgba(255,255,255,0.45)"
+      indicator-active-color="#1C8FFA"
+      autoplay="{{ true }}"
+      interval="{{ 3500 }}"
+      duration="{{ 500 }}"
+      circular="{{ true }}"
+    >
+      <block wx:for="{{ bannerUrls }}" wx:key="*this">
+        <swiper-item>
+          <image class="home-swiper__img" src="{{ item }}" mode="aspectFill" />
+        </swiper-item>
+      </block>
+    </swiper>
+  </view>
+
+  <view class="actions">
+    <button class="btn btn--primary" bindtap="goRegion">选座预约</button>
+    <button class="btn btn--plain" bindtap="goAnnounce">公告中心</button>
+  </view>
+
+  <view class="rules-card">
+    <view class="rules-card__title">自习室使用约定</view>
+    <view class="rules-card__item">1. 预约日期需在允许范围内；当日勿选已过时段；营业时间为每日 08:00–22:30，时段按整点小时选择；非会员按约满时长计费（模拟支付）。</view>
+    <view class="rules-card__item">2. 入内请保持安静，手机静音或震动；勿占座、勿长期离开仍占用座位。</view>
+    <view class="rules-card__item">3. 保持桌面与地面整洁，垃圾自行带走；勿携带刺激性气味食物。</view>
+    <view class="rules-card__item">4. 预约成功后请在「入座」页按时签到，离开时点击「签退」；取消预约须早于规定时间（以公告或前台说明为准）。</view>
+    <view class="rules-card__item">5. 贵重物品请自行保管；与他人共用空间时互相礼让。</view>
+  </view>
+
+  <view class="section section--notices">
+    <view class="section__title">最新公告</view>
+    <block wx:if="{{ notices.length }}">
+      <view class="notice" wx:for="{{ notices }}" wx:key="id">
+        <text class="notice__title">{{ item.title }}</text>
+      </view>
+    </block>
+    <view class="notice-empty" wx:elif="{{ noticesLoaded }}">
+      <van-empty description="暂无公告" image="default" />
+    </view>
+  </view>
+
+  <view class="contact-card">
+    <view class="contact-card__title">联系我们</view>
+    <view class="contact-card__item">
+      <text class="contact-card__ico">📞</text>
+      <text class="contact-card__txt">电话：138-0000-0000</text>
+    </view>
+    <view class="contact-card__item">
+      <text class="contact-card__ico">💬</text>
+      <text class="contact-card__txt">微信：studyroom_kf</text>
+    </view>
+  </view>
+
+  <view class="tip">登录帐号后可同步预约记录（「我的」→ 登录）</view>
+</view>

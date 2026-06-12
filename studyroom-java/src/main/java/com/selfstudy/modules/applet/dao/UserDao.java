@@ -10,7 +10,7 @@ import org.apache.ibatis.annotations.Select;
 /**
  * 用户
  *
- * @author Mark 2891517520@qq.com
+ * @author kon-foreverkon-forever
  */
 @Mapper
 public interface UserDao extends BaseMapper<UserEntity> {

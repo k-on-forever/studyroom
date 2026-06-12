@@ -2,86 +2,96 @@ package com.selfstudy.modules.applet.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 
 /**
- * jwt工具类
- *
- * @author Mark 2891517520@qq.com
+ * jwt工具类（JJWT 0.12 + Spring Boot 3 / Jakarta）
  */
 @ConfigurationProperties(prefix = "applet.jwt")
 @Component
 public class JwtUtils {
-    private Logger logger = LoggerFactory.getLogger(getClass());
+	private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private String secret;
-    private long expire;
-    private String header;
+	private String secret;
+	private long expire;
+	private String header;
 
-    /**
-     * 生成jwt token
-     */
-    public String generateToken(long userId) {
-        Date nowDate = new Date();
-        //过期时间
-        Date expireDate = new Date(nowDate.getTime() + expire * 1000);
+	private SecretKey signKey;
 
-        return Jwts.builder()
-                .setHeaderParam("typ", "JWT")
-                .setSubject(userId+"")
-                .setIssuedAt(nowDate)
-                .setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
-    }
+	private SecretKey resolveSignKey() {
+		if (signKey != null) {
+			return signKey;
+		}
+		try {
+			byte[] raw = secret != null ? secret.getBytes(StandardCharsets.UTF_8) : new byte[0];
+			byte[] hash = MessageDigest.getInstance("SHA-256").digest(raw);
+			signKey = Keys.hmacShaKeyFor(hash);
+			return signKey;
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 
-    public Claims getClaimByToken(String token) {
-        try {
-            return Jwts.parser()
-                    .setSigningKey(secret)
-                    .parseClaimsJws(token)
-                    .getBody();
-        }catch (Exception e){
-            logger.debug("validate is token error ", e);
-            return null;
-        }
-    }
+	public String generateToken(long userId) {
+		Date nowDate = new Date();
+		Date expireDate = new Date(nowDate.getTime() + expire * 1000);
+		return Jwts.builder()
+				.subject(String.valueOf(userId))
+				.issuedAt(nowDate)
+				.expiration(expireDate)
+				.signWith(resolveSignKey())
+				.compact();
+	}
 
-    /**
-     * token是否过期
-     * @return  true：过期
-     */
-    public boolean isTokenExpired(Date expiration) {
-        return expiration.before(new Date());
-    }
+	public Claims getClaimByToken(String token) {
+		try {
+			return Jwts.parser()
+					.verifyWith(resolveSignKey())
+					.build()
+					.parseSignedClaims(token)
+					.getPayload();
+		} catch (Exception e) {
+			logger.debug("validate is token error ", e);
+			return null;
+		}
+	}
 
-    public String getSecret() {
-        return secret;
-    }
+	public boolean isTokenExpired(Date expiration) {
+		return expiration.before(new Date());
+	}
 
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
+	public String getSecret() {
+		return secret;
+	}
 
-    public long getExpire() {
-        return expire;
-    }
+	public void setSecret(String secret) {
+		this.secret = secret;
+		this.signKey = null;
+	}
 
-    public void setExpire(long expire) {
-        this.expire = expire;
-    }
+	public long getExpire() {
+		return expire;
+	}
 
-    public String getHeader() {
-        return header;
-    }
+	public void setExpire(long expire) {
+		this.expire = expire;
+	}
 
-    public void setHeader(String header) {
-        this.header = header;
-    }
+	public String getHeader() {
+		return header;
+	}
+
+	public void setHeader(String header) {
+		this.header = header;
+	}
 }

@@ -1,0 +1,39 @@
+<view class="page-stats">
+  <view class="stats-summary">
+    <view class="stats-summary__item">
+      <text class="stats-summary__num">{{ totalHours }}</text>
+      <text class="stats-summary__unit">小时</text>
+      <text class="stats-summary__sub">{{ totalMinutesRemain }} 分钟</text>
+    </view>
+    <view class="stats-summary__divider"></view>
+    <view class="stats-summary__item">
+      <text class="stats-summary__num">{{ streakDays }}</text>
+      <text class="stats-summary__unit">天</text>
+      <text class="stats-summary__sub">连续学习打卡</text>
+    </view>
+  </view>
+
+  <view class="heat-title">最近 12 周学习热力（颜色越深时长越长）</view>
+  <view class="heat-wrap">
+    <view class="heat-grid">
+      <view
+        wx:for="{{ heatmapDays }}"
+        wx:key="date"
+        class="heat-cell heat-cell--{{ item.level }}"
+      />
+    </view>
+    <view class="heat-legend">
+      <text class="heat-legend__l">少</text>
+      <view class="heat-legend__dots">
+        <view class="heat-chip heat-chip--0" />
+        <view class="heat-chip heat-chip--1" />
+        <view class="heat-chip heat-chip--2" />
+        <view class="heat-chip heat-chip--3" />
+        <view class="heat-chip heat-chip--4" />
+      </view>
+      <text class="heat-legend__l">多</text>
+    </view>
+  </view>
+
+  <view class="heat-hint" wx:if="{{ !hasToken }}">登录后可查看与您「签退」记录同步的统计。</view>
+</view>

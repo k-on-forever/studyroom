@@ -1,0 +1,60 @@
+# =============================================================================
+# 生产环境示例：复制为 application-prod.yml 或通过运维注入等价环境变量（勿提交真实密钥）
+# 启动：java -jar studyroom.jar --spring.profiles.active=prod
+# =============================================================================
+
+spring:
+  datasource:
+    druid:
+      url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:study-room}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+      username: ${MYSQL_USER:studyroom}
+      password: ${MYSQL_PASSWORD:}
+      stat-view-servlet:
+        enabled: false
+      web-stat-filter:
+        enabled: false
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+# 关闭 API 文档（生产勿对外暴露）
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# 环境变量（建议在系统/容器中配置，勿写入仓库）：
+#   STUDY_ADMIN_JWT_SECRET  — 管理端 JWT
+#   APPLET_JWT_SECRET       — 小程序 JWT
+#   MYSQL_PASSWORD / REDIS_PASSWORD
+#   STUDY_CORS_ORIGINS      — 逗号分隔，如 https://admin.example.com,https://www.example.com
+
+study:
+  captcha:
+    memory-fallback: false
+  exception:
+    expose-detail: false
+  cors:
+    allowed-origin-patterns:
+      - https://your-admin-domain.com
+    allow-credentials: true
+  admin:
+    jwt:
+      secret: ${STUDY_ADMIN_JWT_SECRET}
+  mini:
+    per-slot-price-yuan: 6
+
+applet:
+  jwt:
+    secret: ${APPLET_JWT_SECRET}
+
+# HTTPS（Tomcat 直连 TLS；若使用 Nginx 终止 TLS 则可省略）
+# server:
+#   ssl:
+#     enabled: true
+#     key-store: classpath:keystore.p12
+#     key-store-password: ${SSL_KEYSTORE_PASSWORD}
+#     key-store-type: PKCS12

@@ -1,0 +1,76 @@
+.page {
+  padding: 28rpx;
+  padding-bottom: 120rpx;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: linear-gradient(180deg, #e8f4ff 0%, #f6f8fc 38%, #f7f8fa 100%);
+}
+.card {
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 22rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 8rpx 28rpx rgba(28, 143, 250, 0.09);
+  border: 1rpx solid rgba(28, 143, 250, 0.07);
+}
+.status .label {
+  font-size: 26rpx;
+  color: #888;
+}
+.status .value {
+  margin-top: 12rpx;
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #1C8FFA;
+}
+.status .sub {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #666;
+}
+.sec-title {
+  font-size: 28rpx;
+  color: #333;
+  margin: 16rpx 0 12rpx 8rpx;
+}
+.order .row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 30rpx;
+}
+.tag {
+  font-size: 24rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+}
+.tag.ok {
+  background: #e8f7ff;
+  color: #1C8FFA;
+}
+.tag.wait {
+  background: #fff3e0;
+  color: #e65100;
+}
+.meta {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #888;
+}
+.act-btn {
+  margin-top: 16rpx !important;
+}
+.order--pending {
+  border-color: rgba(230, 81, 0, 0.15);
+}
+.foot {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.06);
+  text-align: center;
+  color: #1C8FFA;
+  font-size: 30rpx;
+}

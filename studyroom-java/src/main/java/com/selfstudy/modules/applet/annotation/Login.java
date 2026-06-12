@@ -5,7 +5,7 @@ import java.lang.annotation.*;
 /**
  * 小程序登录效验
  *
- * @author Mark 2891517520@qq.com
+ * @author kon-foreverkon-forever
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

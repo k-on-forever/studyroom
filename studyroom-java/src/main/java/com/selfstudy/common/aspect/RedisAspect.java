@@ -12,26 +12,28 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Redis切面处理类
  *
- * @author Mark 2891517520@qq.com
+ * @author kon-foreverkon-forever
  */
 @Aspect
 @Configuration
 public class RedisAspect {
     private Logger logger = LoggerFactory.getLogger(getClass());
     //是否开启redis缓存  true开启   false关闭
-    @Value("${spring.redis.open: false}")
+    @Value("${study.redis-utils-enabled:false}")
     private boolean open;
 
     @Around("execution(* com.selfstudy.common.utils.RedisUtils.*(..))")
     public Object around(ProceedingJoinPoint point) throws Throwable {
         Object result = null;
-        if(open){
-            try{
+        if (open) {
+            try {
                 result = point.proceed();
-            }catch (Exception e){
+            } catch (Exception e) {
                 logger.error("redis error", e);
                 throw new RRException("Redis服务异常");
             }
+        } else {
+            result = point.proceed();
         }
         return result;
     }

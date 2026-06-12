@@ -1,7 +1,7 @@
 {
   "usingComponents": {
     "van-empty": "/libs/vant-ui/empty/index",
-    "van-dialog": "/libs/vant-ui/dialog/index"
+    "van-button": "/libs/vant-ui/button/index"
   },
   "navigationBarTitleText": "入座"
 }

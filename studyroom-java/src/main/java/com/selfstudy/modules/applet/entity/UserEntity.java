@@ -15,7 +15,7 @@ import java.util.Date;
 /**
  * 用户
  *
- * @author Mark 2891517520@qq.com
+ * @author kon-foreverkon-forever
  */
 @Data
 @Builder
@@ -55,9 +55,9 @@ public class UserEntity implements Serializable {
 	 */
 	private String name;
 	/**
-	 * 'qq账号'
+	 * QQ 号（可能超过 int 范围，与库列 BIGINT 对应）
 	 */
-	private Integer qq;
+	private Long qq;
 
 	/**
 	 * '邮箱'

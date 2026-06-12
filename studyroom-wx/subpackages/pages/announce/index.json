@@ -1,3 +1,5 @@
 {
-  "usingComponents": {}
+  "usingComponents": {},
+  "navigationBarTitleText": "公告中心",
+  "enablePullDownRefresh": true
 }

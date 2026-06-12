@@ -1,8 +1,11 @@
 package com.selfstudy.modules.applet.vo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 /**
  * 我的预约信息返回模型
@@ -50,6 +53,7 @@ public class BasAppointmentVO {
     /**
      * 座位名称
      */
+    @JsonProperty("sname")
     private String sName;
     /**
      * 自习室名称
@@ -59,4 +63,14 @@ public class BasAppointmentVO {
      * 楼层
      */
     private String floor;
+
+    /** 计价金额 */
+    private BigDecimal payAmount;
+    /** 0 会员免费 1 按次已付(模拟) */
+    private Integer payStatus;
+
+    /** 签到时间（毫秒时间戳，可为空） */
+    private Long checkInAt;
+    /** 结束学习完成时间（毫秒时间戳，可为空） */
+    private Long studyEndAt;
 }

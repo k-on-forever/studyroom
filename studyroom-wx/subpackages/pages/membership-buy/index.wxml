@@ -1,0 +1,13 @@
+<view class="page">
+  <view class="lead">选择会员卡后支付；支付成功请在「会员卡激活」或「我的会员」中选择生效日（两年内可选）。</view>
+  <view wx:for="{{ cards }}" wx:key="id" class="card">
+    <view class="row">
+      <text class="name">{{ item.cardName }}</text>
+      <text class="price">¥{{ item.priceYuan }}</text>
+    </view>
+    <view class="days">有效期 {{ item.validityDays }} 天 · {{ item.cardKind }}</view>
+    <view class="benefit">{{ item.benefitDesc }}</view>
+    <van-button type="primary" color="#1C8FFA" size="small" block data-id="{{ item.id }}" data-price="{{ item.priceYuan }}" bindtap="onBuy">购买</van-button>
+  </view>
+  <van-empty wx:if="{{ loaded && cards.length === 0 }}" description="暂无上架卡种" />
+</view>

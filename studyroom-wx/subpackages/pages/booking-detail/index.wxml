@@ -1,0 +1,33 @@
+<view class="bd-page" wx:if="{{ detail }}">
+  <view class="bd-card">
+    <view class="bd-state">{{ stateLabel }}</view>
+    <view class="bd-row"><text class="bd-k">时段</text><text class="bd-v bd-v--pre">{{ detail.seatDayDisplay || detail.seatDay }}</text></view>
+    <view class="bd-row"><text class="bd-k">位置</text><text class="bd-v">{{ detail.floor }} · {{ detail.roomName }} · {{ detail.sname }}座</text></view>
+    <view class="bd-row"><text class="bd-k">姓名</text><text class="bd-v">{{ detail.seatName }}</text></view>
+    <view class="bd-row"><text class="bd-k">手机</text><text class="bd-v">{{ detail.seatPhone }}</text></view>
+    <view class="bd-row" wx:if="{{ detail.checkInAtText }}"><text class="bd-k">签到</text><text class="bd-v">{{ detail.checkInAtText }}</text></view>
+    <view class="bd-row" wx:if="{{ detail.studyEndAtText }}"><text class="bd-k">签退</text><text class="bd-v">{{ detail.studyEndAtText }}</text></view>
+    <view class="bd-row" wx:if="{{ detail.payAmount != null && detail.payStatus != null }}">
+      <text class="bd-k">计费</text>
+      <text class="bd-v bd-pay">{{ detail.payStatus === 0 ? '会员免费' : ('¥' + detail.payAmount) }}</text>
+    </view>
+  </view>
+
+  <view class="bd-actions">
+    <block wx:if="{{ detail.seatState === 0 }}">
+      <van-button
+        type="primary"
+        color="#1C8FFA"
+        block
+        disabled="{{ !detail.canSignIn }}"
+        bindtap="onSignIn"
+      >{{ detail.canSignIn ? '签到' : detail.signInHint }}</van-button>
+      <van-button style="margin-top: 20rpx;" plain hairline type="danger" color="#ee0a24" block bindtap="onCancel">取消预约</van-button>
+    </block>
+    <van-button wx:if="{{ detail.seatState === 1 }}" type="primary" color="#07c160" block bindtap="onOver">签退</van-button>
+  </view>
+</view>
+
+<view class="bd-empty" wx:else>
+  <text>{{ loadErr || '加载中…' }}</text>
+</view>

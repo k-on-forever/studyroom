@@ -1,0 +1,35 @@
+<view class="page-my outermost-layer-tab">
+  <view class="my-hero">
+    <block wx:if="{{ hasToken && userInfo.name }}">
+      <view class="my-user-card" bindtap="goInformation">
+        <image class="my-user-card__avatar" src="{{ userInfo.userImg || 'https://s1.ax1x.com/2023/02/03/pSsaIPI.png' }}" mode="aspectFill" />
+        <view class="my-user-card__info">
+          <text class="my-user-card__name">{{ userInfo.name || '用户' }}</text>
+          <text class="my-user-card__phone">{{ userInfo.mobile || '' }}</text>
+        </view>
+      </view>
+    </block>
+    <block wx:else>
+      <text class="my-hero__t">个人中心</text>
+      <text class="my-hero__d">预约、会员与帐号</text>
+    </block>
+  </view>
+
+  <view class="my-grid-wrap sr-card">
+    <view class="my-grid-title">全部服务</view>
+    <view class="my-grid">
+      <view
+        class="my-grid__item"
+        wx:for="{{ menuList }}"
+        wx:key="key"
+        bindtap="onMenuTap"
+        data-handler="{{ item.handler }}"
+      >
+        <view class="my-grid__circle my-grid__circle--{{ item.theme }}">
+          <text class="my-grid__icon">{{ item.icon }}</text>
+        </view>
+        <text class="my-grid__label">{{ item.label }}</text>
+      </view>
+    </view>
+  </view>
+</view>

@@ -7,23 +7,21 @@ import com.selfstudy.modules.applet.annotation.Login;
 import com.selfstudy.modules.applet.form.LoginForm;
 import com.selfstudy.modules.applet.form.WXLoginForm;
 import com.selfstudy.modules.applet.service.UserService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 /**
  * 小程序登录接口
  *
- * @author Mark 2891517520@qq.com
+ * @author kon-foreverkon-forever
  */
 @Validated
 @RestController
 @RequestMapping("/applet")
-@Api(tags = "小程序登录接口")
+@Tag(name = "小程序登录接口")
 public class AppLoginController {
     @Autowired
     private UserService userService;
@@ -34,27 +32,24 @@ public class AppLoginController {
      * @return
      */
     @PostMapping("/wxLogin")
-    @ApiOperation("微信小程序登录")
+    @Operation(summary = "微信小程序登录")
     public R wxLogin(@RequestBody @Validated WXLoginForm wxLoginForm) {
-        return R.ok(userService.wxLogin(wxLoginForm));
+        return userService.wxLogin(wxLoginForm);
     }
 
     /**
      * 登录
      */
     @PostMapping("/login")
-    @ApiOperation("登录")
+    @Operation(summary = "登录")
     public R login(@RequestBody LoginForm form){
-        //表单校验
         ValidatorUtils.validateEntity(form);
-        //用户登录
-        Map<String, Object> map = userService.login(form);
-        return R.ok(map);
+        return userService.login(form);
     }
 
     @Login
     @PostMapping("/logOut")
-    @ApiOperation("退出登录 不需要传参")
+    @Operation(summary = "退出登录 不需要传参")
     public R logout(@RequestAttribute("userId") Long userId){
         return userService.logout(userId);
     }

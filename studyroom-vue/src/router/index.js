@@ -15,6 +15,16 @@ Vue.use(Router)
 // 开发环境不使用懒加载, 因为懒加载页面太多的话会造成webpack热更新太慢, 所以只有生产环境使用懒加载
 const _import = require('./import-' + process.env.NODE_ENV)
 
+// 动态菜单注册后仍保留的固定子路由（避免后端菜单为空时只剩空白页）
+const mainFixedChildren = [
+  { path: '/home', component: _import('common/home'), name: 'home', meta: { title: '首页' } },
+  { path: '/bas/analytics-revenue', component: _import('modules/bas/analytics-revenue'), name: 'bas-analytics-revenue', meta: { title: '营收统计' } },
+  { path: '/bas/analytics-util', component: _import('modules/bas/analytics-utilization'), name: 'bas-analytics-util', meta: { title: '座位利用率' } },
+  { path: '/bas/seat-editor', component: _import('modules/bas/seat-editor'), name: 'bas-seat-editor', meta: { title: '座位编辑器' } },
+  { path: '/bas/sys-log', component: _import('modules/bas/sys-log'), name: 'bas-sys-log', meta: { title: '操作日志' } },
+  { path: '/theme', component: _import('common/theme'), name: 'theme', meta: { title: '主题' } }
+]
+
 // 全局路由(无需嵌套上左右整体布局)
 const globalRoutes = [
   { path: '/404', component: _import('common/404'), name: '404', meta: { title: '404未找到' } },
@@ -28,19 +38,13 @@ const mainRoutes = {
   name: 'main',
   redirect: { name: 'home' },
   meta: { title: '主入口整体布局' },
-  children: [
-    // 通过meta对象设置路由展示方式
-    // 1. isTab: 是否通过tab展示内容, true: 是, false: 否
-    // 2. iframeUrl: 是否通过iframe嵌套展示内容, '以http[s]://开头': 是, '': 否
-    // 提示: 如需要通过iframe嵌套展示内容, 但不通过tab打开, 请自行创建组件使用iframe处理!
-    { path: '/home', component: _import('common/home'), name: 'home', meta: { title: '首页' } },
-    { path: '/theme', component: _import('common/theme'), name: 'theme', meta: { title: '主题' } }
-  ],
+  children: mainFixedChildren.slice(),
   beforeEnter (to, from, next) {
     let token = Vue.cookie.get('token')
     if (!token || !/\S/.test(token)) {
       clearLoginInfo()
       next({ name: 'login' })
+      return
     }
     next()
   }
@@ -65,6 +69,13 @@ router.beforeEach((to, from, next) => {
       method: 'get',
       params: http.adornParams()
     }).then(({data}) => {
+      if (data && data.code === 401) {
+        clearLoginInfo()
+        sessionStorage.setItem('menuList', '[]')
+        sessionStorage.setItem('permissions', '[]')
+        next({ name: 'login', replace: true })
+        return
+      }
       if (data && data.code === 0) {
         fnAddDynamicMenuRoutes(data.menuList)
         router.options.isAddDynamicMenuRoutes = true
@@ -77,8 +88,11 @@ router.beforeEach((to, from, next) => {
         next()
       }
     }).catch((e) => {
-      console.log(`%c${e} 请求菜单列表和权限失败，跳转至登录页！！`, 'color:blue')
-      router.push({ name: 'login' })
+      console.warn('请求菜单列表失败:', e)
+      clearLoginInfo()
+      sessionStorage.setItem('menuList', '[]')
+      sessionStorage.setItem('permissions', '[]')
+      next({ name: 'login', replace: true })
     })
   }
 })
@@ -139,17 +153,46 @@ function fnAddDynamicMenuRoutes (menuList = [], routes = []) {
   if (temp.length >= 1) {
     fnAddDynamicMenuRoutes(temp, routes)
   } else {
-    mainRoutes.name = 'main-dynamic'
-    mainRoutes.children = routes
-    router.addRoutes([
-      mainRoutes,
-      { path: '*', redirect: { name: '404' } }
-    ])
+    mainRoutes.children = mainFixedChildren.concat(routes)
     sessionStorage.setItem('dynamicMenuRoutes', JSON.stringify(mainRoutes.children || '[]'))
     console.log('\n')
     console.log('%c!<-------------------- 动态(菜单)路由 s -------------------->', 'color:blue')
     console.log(mainRoutes.children)
     console.log('%c!<-------------------- 动态(菜单)路由 e -------------------->', 'color:blue')
+
+    if (routes.length === 0) {
+      // 后端菜单为空时，初始路由里已有 main + home/theme，不能再 addRoutes(mainRoutes)，否则会重复注册同名路由并告警
+      if (!router.options.__fallback404Added) {
+        router.addRoutes([{ path: '*', redirect: { name: '404' } }])
+        router.options.__fallback404Added = true
+      }
+    } else {
+      // 有动态菜单时不能再 addRoutes(mainRoutes)：会与初始路由里已注册的 home/theme 重名。
+      // 用 matcher 整体替换为「固定子路由 + 动态路由」一份表。
+      const mainWithChildren = {
+        path: '/',
+        component: mainRoutes.component,
+        name: 'main',
+        redirect: mainRoutes.redirect,
+        meta: mainRoutes.meta,
+        beforeEnter: mainRoutes.beforeEnter,
+        children: mainFixedChildren.concat(routes)
+      }
+      const rebuilt = new Router({
+        mode: router.mode,
+        scrollBehavior: router.options.scrollBehavior,
+        routes: globalRoutes.concat([
+          mainWithChildren,
+          { path: '*', redirect: { name: '404' } }
+        ])
+      })
+      router.matcher = rebuilt.matcher
+      router.options.routes = rebuilt.options.routes
+      mainRoutes.children = mainWithChildren.children
+      if (!router.options.__fallback404Added) {
+        router.options.__fallback404Added = true
+      }
+    }
   }
 }
 

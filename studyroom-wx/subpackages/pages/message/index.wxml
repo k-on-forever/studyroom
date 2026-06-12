@@ -17,9 +17,16 @@
       请填写的您的问题与意见
     </view>
     <view class="fill_in">
-      <textarea name="textarea" class="weui-textarea" minlength="{{min}}" maxlength="{{max}}" value="{{dataFrom.autograph}}" placeholder-class="phcolor" bindinput="inputeExplain" data-obj="dataFrom.autograph">
-        <text class="currentWordNumber">{{currentWordNumber|0}}/{{max}}</text>
-      </textarea>
+      <textarea
+        class="weui-textarea"
+        minlength="{{min}}"
+        maxlength="{{max}}"
+        value="{{dataFrom.message}}"
+        placeholder="请描述您的问题或建议"
+        placeholder-class="phcolor"
+        bindinput="onMessageInput"
+      />
+      <view class="word-count">{{wordCount}}/{{max}}</view>
     </view>
   </view>
 

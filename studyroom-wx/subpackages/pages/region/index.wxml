@@ -1,119 +1,236 @@
-<view class="section">
-  <view class="page-section swiper">
-    <swiper indicator-dots="{{indicatorDots}}" indicator-color="#ffffff" indicator-active-color="#1C8FFA" autoplay="{{autoplay}}" interval="{{interval}}" duration="{{duration}}" class="page-section-spacing">
-      <block wx:for="{{backgroundSwiper}}" wx:key="*this">
-        <swiper-item>
-          <van-image width="100%" height="100%" src="{{ item }}" />
-        </swiper-item>
-      </block>
-    </swiper>
-  </view>
+<wxs src="./cell-style.wxs" module="cs" />
+<view class="section page-region">
   <view class="centered name_title">
-    <view class="name">{{ roomName }}</view>
-    <view class="name_time">营业时间 {{roomTime}}</view>
+    <view class="name_title__stack">
+      <text class="name">{{ roomName }}</text>
+      <text class="name_title__sub" wx:if="{{ floorLabel }}">{{ floorLabel }}</text>
+    </view>
+    <view class="name_time">营业 {{roomTime}}</view>
   </view>
+  <view class="closing-banner" wx:if="{{ closingHint }}">{{ closingHint }}</view>
   <view class="floor centered">
     <view>预定楼层</view>
     <view class="reserve_floor">
-      <view class="layer_floor {{ floorIndex == index ? 'floorColor':'' }}" wx:for="{{ floor }}" wx:key="*this" data-index="{{index}}" data-id="{{ item.id }}"  bindtap="reserveFloor">
+      <view class="layer_floor {{ floorIndex == index ? 'floorColor':'' }}" wx:for="{{ floor }}" wx:key="id" data-index="{{index}}" data-id="{{ item.id }}"  bindtap="reserveFloor">
         {{item.floor}}
       </view>
     </view>
   </view>
-  <view class="centered scheduled">
-    <view class="mode">预定时间</view>
-    <view class="scheduled_time">
-      <view bindtap="showPopup" class="scheduled_stateTime">{{ stateTime }}</view>
-      <view>至</view>
-      <view bindtap="showPopupEnd" class="scheduled_stateTime">{{ endTime }}</view>
-    </view>
-  </view>
-  <view class="tips centered">
-    <text class="iconfont icon-zhuyishixiang_l" style="color: #009e6a;"></text>
-    <span>可提前365天预定，最长可预订365天</span>
-  </view>
   <van-divider hairline />
   <view class="centered tab">
-    <view class="self_study" wx:for="{{ room }}" wx:key="*this">
+    <view class="self_study" wx:for="{{ room }}" wx:key="roomId">
       <view class="self_title" data-index="{{index}}" data-id="{{item.roomId}}"  data-item="{{item}}"  bindtap="reserveRoom">{{item.roomName}}</view>
       <view class="self_icon {{ roomIndex == index ? 'self_back':'' }}"></view>
     </view>
   </view>
-  <view class="centered seat">
-    <view class="seat_icon" wx:for="{{ seatList }}" wx:key="*this">
-      <text class="iconfont icon-zuowei {{ seatIndex == index ? 'seat_no': item.roomState == '1' ? 'seat_green':'seat_off' }}" data-index="{{index}}" data-item="{{item}}" bindtap="handSeat"></text>
-      <view class="seat_text">{{ item.seatName }}</view>
+
+  <view class="seat-map-wrap seat-map-wrap--loading centered" wx:if="{{ seatLoading }}">
+    <van-loading size="36rpx" vertical color="#1C8FFA">加载座位与占用…</van-loading>
+  </view>
+  <view class="seat-map-wrap" wx:elif="{{ !seatLoading && seatList.length && seatCoordMap }}">
+    <view class="seat-map-hero">
+      <view class="seat-map-hero__t">门店平面图 · 坐标布局</view>
+      <view class="seat-map-hero__d">灰格=布局占位 · 浅灰=空闲 · 蓝=已选 · 绿=已占用(预约/维修) · 橙=当前不可订(全员锁定或非授权)</view>
     </view>
-    <view class="seat_icon"></view>
-    <view class="seat_icon"></view>
-    <view class="seat_icon"></view>
-    <view class="seat_icon"></view>
+    <view class="coord-seat-grid" style="{{ seatCoordMap.gridStyle }}">
+      <view
+        wx:for="{{ seatCoordMap.cells }}"
+        wx:for-item="cell"
+        wx:key="key"
+        class="{{ cs.megaCell(cell, dataFrom.seatId) }}"
+        data-sid="{{ cell.sid }}"
+        bindtap="onMegaCellTap"
+      >
+        <block wx:if="{{ !cell.ghost }}">
+          <view class="seat-mega__desk"></view>
+          <text class="iconfont icon-zuowei seat-mega__ico"></text>
+          <text class="seat-mega__lbl">{{ cell.label }}</text>
+        </block>
+        <block wx:else>
+          <text class="seat-mega__ghost-mark">占位</text>
+        </block>
+      </view>
+    </view>
+  </view>
+  <view class="seat-map-wrap" wx:elif="{{ !seatLoading && seatList.length && seatMegaMap }}">
+    <view class="seat-map-hero">
+      <view class="seat-map-hero__t">门店平面图 · 选座</view>
+      <view class="seat-map-hero__d">灰格=布局占位 · 浅灰=空闲 · 蓝=已选 · 绿=已占用(预约/维修) · 橙=当前不可订(全员锁定或非授权)</view>
+    </view>
+    <view wx:for="{{ seatMegaMap.tiers }}" wx:for-item="tier" wx:for-index="tix" wx:key="title" class="seat-mega-floor tier tier--{{ tier.theme }}">
+      <view class="seat-mega-floor__rail">
+        <text class="seat-mega-floor__rail-v">{{ tier.badgeLine }}</text>
+      </view>
+      <view class="seat-mega-floor__main">
+        <view class="seat-mega-floor__head">
+          <view class="seat-mega-floor__head-text">
+            <text class="seat-mega-floor__title">{{ tier.title }}</text>
+            <text class="seat-mega-floor__zone">{{ tier.zone }}</text>
+          </view>
+        </view>
+        <view class="seat-mega-floor__plate">
+          <view
+            wx:for="{{ tier.decors }}"
+            wx:for-item="dc"
+            wx:for-index="dix"
+            wx:key="cls"
+            class="seat-mega-floor__maptag seat-mega-floor__maptag--{{ dc.cls }}"
+          >{{ dc.t }}</view>
+          <view class="seat-mega-floor__grid">
+            <view
+              wx:for="{{ tier.cells }}"
+              wx:for-item="cell"
+              wx:for-index="ck"
+              wx:key="ck"
+              class="{{ cs.megaCell(cell, dataFrom.seatId) }}"
+              data-sid="{{ cell.sid }}"
+              bindtap="onMegaCellTap"
+            >
+              <block wx:if="{{ !cell.ghost }}">
+                <view class="seat-mega__desk"></view>
+                <text class="iconfont icon-zuowei seat-mega__ico"></text>
+                <text class="seat-mega__lbl">{{ cell.label }}</text>
+              </block>
+              <block wx:else>
+                <text class="seat-mega__ghost-mark">占位</text>
+              </block>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="seat-map-empty centered" wx:elif="{{ !seatLoading && !seatList.length }}">
+    <text class="seat-map-empty__t">暂无座位数据</text>
+    <text class="seat-map-empty__d">请先选择楼层与自习室，或稍后重试</text>
   </view>
 
   <van-divider hairline />
-  <view class="centered tab">
-    <view class="self_study">
-      <view class="self_title">预约信息</view>
-      <view class="self_icon self_fill"></view>
+  <view class="book-time-card">
+    <view class="book-time-card__head">
+      <text class="book-time-card__title">预约时长</text>
+      <text class="book-time-card__badge">最短 1 小时</text>
     </view>
+    <text class="book-time-card__hint" wx:if="{{ durationPanelHint }}">{{ durationPanelHint }}</text>
+
+    <view class="book-time-card__grid" wx:if="{{ durationPresets.length }}">
+      <view
+        wx:for="{{ durationPresets }}"
+        wx:key="key"
+        class="dur-opt {{ selectedDurationKey === item.key ? 'dur-opt--on' : '' }}"
+        data-key="{{ item.key }}"
+        data-hours="{{ item.hours }}"
+        bindtap="onDurationPresetTap"
+      >
+        <text class="dur-opt__label">{{ item.label }}</text>
+        <text class="dur-opt__sub" wx:if="{{ item.subLabel }}">{{ item.subLabel }}</text>
+      </view>
+    </view>
+    <view class="book-time-card__empty" wx:else>
+      <text class="iconfont icon-zhuyishixiang_l book-time-card__empty-ico"></text>
+      <text>距打烊不足 1 小时，请改选开始时刻</text>
+    </view>
+
+    <view class="book-time-card__divider"></view>
+    <view class="book-time-card__range">
+      <view class="range-cell" bindtap="showPopup">
+        <text class="range-cell__k">开始</text>
+        <text class="range-cell__v">{{ displayBookingStart }}</text>
+      </view>
+      <view class="range-cell__sep">
+        <text class="range-cell__arrow">→</text>
+      </view>
+      <view class="range-cell" bindtap="showPopupEnd">
+        <text class="range-cell__k">结束</text>
+        <text class="range-cell__v">{{ displayBookingEnd }}</text>
+      </view>
+    </view>
+    <text class="book-time-card__fine-tip" wx:if="{{ bookingRangeEndLabel }}">可预约至 {{ bookingRangeEndLabel }}（含当日共 {{ advanceBookingDays }} 天）</text>
+    <text class="book-time-card__fine-tip">需要精确到分钟时，点上方开始/结束修改</text>
   </view>
-  <view class="fill_form">
-      <van-cell-group>
-          <van-field
-            value="{{ dataFrom.seatPhone }}"
-            placeholder="请输入电话"
-            border="{{ true }}"
-            bind:change="onChangePhone"
-            label="电话"
-          />
-        
-        <view style="margin-top: 15rpx;">
-          <van-field
-            value="{{ dataFrom.seatName }}"
-            placeholder="请输入姓名"
-            border="{{ true }}"
-            bind:change="onChangeName"
-            label="姓名"
-          />
-        </view>
-        <view style="margin-top: 15rpx;">
-          <van-field
-            value="{{ dataFrom.seatClass }}"
-            placeholder="请输入专业班级"
-            border="{{ true }}"
-            bind:change="onChangeMajor"
-            label="专业班级"
-          />
-        </view>
-      </van-cell-group>
+  <view class="tips tips--wrap">
+    <view class="tips__head" bindtap="toggleLongRules">
+      <text class="iconfont icon-zhuyishixiang_l tips__ico"></text>
+      <text class="tips__summary">预约规则摘要 · 点按展开</text>
+      <text class="tips__chev">{{ showLongRules ? '▲' : '▼' }}</text>
+    </view>
+    <text class="tips__inline" wx:if="{{ !showLongRules }}">营业 08:00–22:30 · 10 分钟一档 · 最短 1 小时 · 计费向上取整（如 1h01min 按 2h 计） · 可提前 {{ advanceBookingDays }} 天</text>
+    <text class="tips__txt" wx:if="{{ showLongRules }}">仅营业 08:00–22:30 内，开始/结束均按 10 分钟对齐；日期不早于今天、不晚于今日起第 {{ advanceBookingDays }} 天；最短 1 小时。非会员按 6 元/小时，计费向上取整（如约 1h10min 按 2h 收费）。绿格=已预约，橙格=不可订。点「立即预定」后进入支付页完成预约。</text>
   </view>
 
-  <!-- 时间弹框 -->
-  <van-popup show="{{ show }}" position="bottom" custom-style="height: 60%;">
-    <van-datetime-picker type="date" value="{{ stateCurrentDate }}" min-date="{{ minDate }}" max-date="{{ maxDate }}" bind:confirm="onConfirm" bind:cancel="onClose" />
+  <van-popup show="{{ show }}" position="bottom" z-index="{{ 10050 }}" custom-style="height: 56%; min-height: 520rpx;">
+    <view class="pv-toolbar" wx:if="{{ show }}">
+      <text class="pv-toolbar__btn" bindtap="onClose">取消</text>
+      <text class="pv-toolbar__title">选择开始日期时间</text>
+      <text class="pv-toolbar__btn pv-toolbar__btn--ok" bindtap="onConfirmStartPicker">确认</text>
+    </view>
+    <view class="picker-sheet-hint" wx:if="{{ show }}">左列选日期、中列时、右列分（10 分钟一档）；可约至 {{ bookingRangeEndLabel }}，共 {{ advanceBookingDays }} 天</view>
+    <picker-view
+      wx:if="{{ show && bookingPickersReady && startPvDates.length }}"
+      class="start-pv"
+      value="{{ startPvValue }}"
+      indicator-style="height: 44px;"
+      bindchange="onStartPickerViewChange"
+    >
+      <picker-view-column>
+        <view wx:for="{{ startPvDates }}" wx:key="*this" class="start-pv__item">{{ item }}</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view wx:for="{{ startPvHours }}" wx:key="*this" class="start-pv__item">{{ item }}时</view>
+      </picker-view-column>
+      <picker-view-column>
+        <view wx:for="{{ startPvMinutes }}" wx:key="*this" class="start-pv__item">{{ item }}分</view>
+      </picker-view-column>
+    </picker-view>
   </van-popup>
-  <van-popup show="{{ flag }}" position="bottom" custom-style="height: 60%;">
-    <van-datetime-picker type="date" value="{{ endCurrentDate }}" min-date="{{ minDate }}" max-date="{{ maxDate }}" bind:confirm="onConfirmEnd" bind:cancel="onClose" />
+  <van-popup show="{{ flag }}" position="bottom" z-index="{{ 10050 }}" custom-style="height: 52%; min-height: 480rpx;">
+    <view class="picker-sheet-hint" wx:if="{{ flag && pickerEndEarliestText }}">{{ pickerEndEarliestText }}</view>
+    <van-datetime-picker
+      wx:if="{{ flag && bookingPickersReady && slotDayMinTs > 0 && slotDayMaxTs > 0 }}"
+      type="datetime"
+      value="{{ valueEndMs }}"
+      min-date="{{ slotDayMinTs }}"
+      max-date="{{ slotDayMaxTs }}"
+      min-hour="{{ 8 }}"
+      max-hour="{{ pickerEndMaxHour }}"
+      min-minute="{{ 0 }}"
+      max-minute="{{ 50 }}"
+      minute-step="{{ 10 }}"
+      same-day-earliest-ms="{{ pickerEndSameDayEarliestMs }}"
+      formatter="{{ pickerColumnFormatter }}"
+      show-toolbar="{{ true }}"
+      title="选择结束时间"
+      confirm-button-text="确认"
+      cancel-button-text="取消"
+      bind:input="onEndPickerInput"
+      bind:confirm="onConfirmDatetimeEnd"
+      bind:cancel="onClose"
+    />
   </van-popup>
-  <view class="fill"></view>
+  <view class="footer-spacer"></view>
 
   <view class="footer">
-    <view class="footer_title">
-      <view class="title_tips">
-        <text>当前已选</text>
+    <view class="footer-legend">
+      <view class="footer-legend__item">
         <span class="title_color blue"></span>
+        <text>已选</text>
       </view>
-      <view class="title_tips" style="padding-left: 60rpx;">
-        <text>空闲</text>
+      <view class="footer-legend__item">
         <span class="title_color white"></span>
+        <text>空闲</text>
       </view>
-      <view class="title_tips" style="padding-left: 60rpx;">
-        <text>已有顾客</text>
+      <view class="footer-legend__item">
         <span class="title_color green"></span>
+        <text>已预约</text>
+      </view>
+      <view class="footer-legend__item">
+        <span class="title_color orange"></span>
+        <text>不可订</text>
       </view>
     </view>
-    <view>
-      <van-button type="primary" color="#1C8FFA" block bindtap="regionCheck">立即预定</van-button>
+    <view class="footer__actions">
+      <van-button type="primary" color="#1C8FFA" block custom-class="footer-book-btn" bindtap="regionCheck">立即预定</van-button>
     </view>
+    <text class="footer__note">点「立即预定」完成支付后，在「入座」页签到/取消</text>
   </view>
 </view>

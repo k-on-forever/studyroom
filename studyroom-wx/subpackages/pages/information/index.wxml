@@ -1,9 +1,13 @@
-<view class="section centered">
+<view class="section centered page-information">
   <view class="fill_form">
-      <view class="from_image">
-        <view>头像</view>
-        <view class="img_border">
-          <image src="{{ dataFrom.userImg || 'https://s1.ax1x.com/2023/02/03/pSsaIPI.png'}}" class="img"/>
+      <view class="from_image from_image--avatar" bindtap="chooseAvatar">
+        <view class="from_image__label">
+          <text>头像</text>
+          <text class="from_image__hint">点击更换</text>
+        </view>
+        <view class="img_border img_border--tap">
+          <image mode="aspectFill" src="{{ dataFrom.userImg || 'https://s1.ax1x.com/2023/02/03/pSsaIPI.png'}}" class="img"/>
+          <view class="img_border__badge" aria-hidden="true">+</view>
         </view>
       </view>
 
@@ -41,11 +45,18 @@
 
       <view class="fill_remarks">
         <view>备注</view>
-        <!-- <view wx:if="{{ fromShow }}">1108756743@163.com</view> -->
-        <view >
-          <textarea name="textarea" class="weui-textarea" minlength="{{min}}" maxlength="{{max}}" value="{{dataFrom.bz}}" placeholder-class="phcolor" bindinput="inputeExplain" data-obj="dataFrom.autograph">
-            <text class="currentWordNumber">{{currentWordNumber|0}}/{{max}}</text>
-          </textarea>
+        <view>
+          <textarea
+            class="weui-textarea"
+            minlength="{{min}}"
+            maxlength="{{max}}"
+            value="{{dataFrom.bz}}"
+            placeholder="选填"
+            placeholder-class="phcolor"
+            bindinput="inputeExplain"
+            data-obj="bz"
+          />
+          <view class="word-count">{{wordCount}}/{{max}}</view>
         </view>
       </view>
   </view>

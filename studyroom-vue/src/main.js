@@ -9,6 +9,7 @@ import '@/element-ui-theme'
 import '@/assets/scss/index.scss'
 import httpRequest from '@/utils/httpRequest' // api: https://github.com/axios/axios
 import { isAuth } from '@/utils'
+import { apiGet, apiPost, apiGetSilent } from '@/utils/api'
 import cloneDeep from 'lodash/cloneDeep'
 
 Vue.use(VueCookie)
@@ -22,6 +23,8 @@ if (process.env.NODE_ENV !== 'production') {
 // 挂载全局
 Vue.prototype.$http = httpRequest // ajax请求方法
 Vue.prototype.isAuth = isAuth     // 权限方法
+Vue.prototype.$apiGet = apiGet    // 通用GET
+Vue.prototype.$apiPost = apiPost  // 通用POST
 
 // 保存整站vuex本地储存初始状态
 window.SITE_CONFIG['storeState'] = cloneDeep(store.state)

@@ -1,78 +1,162 @@
-import pages from "../../../pages";
-import { register } from "../../../api/register";
+const pages = require("../../../pages/index.js");
+const { register, sendRegisterSms } = require("../../../api/register");
+const { login } = require("../../../api/login");
+
 Page({
-  /**
-   * 页面的初始数据
-   */
   data: {
     dataRegisterFrom: {
       account: "",
       password: "",
+      confirmPassword: "",
+      smsCode: "",
     },
-    // 验证码按钮状态
-    verificationStatus: true,
-    // 用户协议单选
-    radio: "",
-    // 可见状态
-    visible: true,
+    smsSeconds: 0,
+    smsBtnText: "获取验证码",
+    showPassword: false,
+    showConfirmPassword: false,
   },
-  onChange(e) {
-    if (e.currentTarget.dataset.sign == "account") {
-      this.setData({
-        "dataRegisterFrom.account": e.detail,
-      });
+
+  pickVal(e) {
+    const d = e.detail;
+    if (d == null) return "";
+    if (typeof d === "string" || typeof d === "number") return String(d);
+    if (typeof d === "object" && d.value != null) return String(d.value);
+    return "";
+  },
+
+  onAccount(e) {
+    this.setData({ "dataRegisterFrom.account": this.pickVal(e) });
+  },
+
+  onPassword(e) {
+    this.setData({ "dataRegisterFrom.password": this.pickVal(e) });
+  },
+
+  onConfirmPassword(e) {
+    this.setData({ "dataRegisterFrom.confirmPassword": this.pickVal(e) });
+  },
+
+  toggleShowPassword() {
+    this.setData({ showPassword: !this.data.showPassword });
+  },
+
+  toggleShowConfirmPassword() {
+    this.setData({ showConfirmPassword: !this.data.showConfirmPassword });
+  },
+
+  onSms(e) {
+    this.setData({ "dataRegisterFrom.smsCode": this.pickVal(e) });
+  },
+
+  onSendSms() {
+    const account = (this.data.dataRegisterFrom.account || "").trim();
+    if (!account) {
+      wx.showToast({ title: "请先填写手机号", icon: "none" });
+      return;
     }
-    if (e.currentTarget.dataset.sign == "password") {
-      this.setData({
-        "dataRegisterFrom.password": e.detail,
-      });
+    if (!/^1[3-9]\d{9}$/.test(account)) {
+      wx.showToast({ title: "请输入正确手机号", icon: "none" });
+      return;
     }
+    sendRegisterSms(account)
+      .then((info) => {
+        if (info.code === 0) {
+          wx.showToast({ title: "已发送(模拟)", icon: "none" });
+          this.startSmsCooldown(55);
+        } else {
+          wx.showToast({ title: info.msg || "发送失败", icon: "none" });
+        }
+      })
+      .catch((e) => {
+        let msg =
+          (e && e.errMsg) ||
+          (e && e.__http && e.errMsg) ||
+          "网络异常：请检查 utils/config.js 里 baseUrl（须能访问到 Java 的 /self-study）";
+        if (msg.indexOf("request:fail") >= 0) {
+          msg = "连不上后端：请启动 studyroom-java，并把 baseUrl 改为本机 IP 或 127.0.0.1:8081/self-study（与 server.port 一致）";
+        }
+        wx.showModal({
+          title: "发送失败",
+          content: msg,
+          showCancel: false,
+        });
+      });
+  },
+
+  startSmsCooldown(sec) {
+    this.setData({ smsSeconds: sec, smsBtnText: sec + "s" });
+    const t = setInterval(() => {
+      const s = this.data.smsSeconds - 1;
+      if (s <= 0) {
+        clearInterval(t);
+        this.setData({ smsSeconds: 0, smsBtnText: "获取验证码" });
+      } else {
+        this.setData({ smsSeconds: s, smsBtnText: s + "s" });
+      }
+    }, 1000);
   },
 
   registration() {
-    console.log(this.data.dataRegisterFrom);
-    register(this.data.dataRegisterFrom).then((info) => {
+    const f = this.data.dataRegisterFrom;
+    if (!f.account || !f.password || !f.confirmPassword || !f.smsCode) {
+      wx.showToast({ title: "请填写完整", icon: "none" });
+      return;
+    }
+    if (f.password !== f.confirmPassword) {
+      wx.showToast({ title: "两次密码不一致", icon: "none" });
+      return;
+    }
+    register({
+      account: f.account.trim(),
+      password: f.password,
+      confirmPassword: f.confirmPassword,
+      smsCode: f.smsCode.trim(),
+    }).then((info) => {
       if (info.code == 0) {
         wx.showToast({
           title: "注册成功",
           icon: "success",
-          duration: 2000,
+          duration: 1200,
         });
-        setTimeout(() => {
-          wx.navigateTo({
-            url: pages.Login,
+        const account = f.account.trim();
+        const password = f.password;
+        login({ account, password })
+          .then((loginInfo) => {
+            const token =
+              loginInfo.token ||
+              (loginInfo.data && loginInfo.data.token);
+            if (loginInfo.code === 0 && token) {
+              wx.setStorageSync("token", token);
+              wx.switchTab({ url: pages.My });
+            } else {
+              wx.showToast({
+                title: loginInfo.msg || "请登录",
+                icon: "none",
+              });
+              wx.navigateTo({ url: pages.Login });
+            }
+          })
+          .catch(() => {
+            wx.navigateTo({ url: pages.Login });
           });
-        }, 500);
+      } else {
+        wx.showToast({ title: info.msg || "注册失败", icon: "none" });
       }
+    }).catch((e) => {
+      let msg = (e && e.errMsg) || "网络异常";
+      if (msg.indexOf("request:fail") >= 0) {
+        msg = "连不上后端：请检查 utils/config.js 的 baseUrl 与后端是否已启动";
+      }
+      wx.showModal({ title: "注册失败", content: msg, showCancel: false });
     });
   },
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad(options) {},
 
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
+  onLoad() {},
   onReady() {},
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
   onShow() {},
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
   onHide() {},
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
   onUnload() {},
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
   onPullDownRefresh() {},
+  onReachBottom() {},
+  onShareAppMessage() {},
 });

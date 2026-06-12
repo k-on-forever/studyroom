@@ -56,3 +56,17 @@ export function clearLoginInfo () {
   store.commit('resetStore')
   router.options.isAddDynamicMenuRoutes = false
 }
+
+/**
+ * 将 axios 网络错误转成可读说明（如 ERR_CONNECTION_REFUSED 多因未启动 Java）
+ */
+export function httpConnErrorMessage (e) {
+  const m = e && e.message ? String(e.message) : ''
+  if (m === 'Network Error' || m.indexOf('ECONNREFUSED') >= 0) {
+    return '无法连接后端：请先启动 studyroom-java，并核对 static/config/index.js（或 window.__BACKEND_BASE__）与端口、context-path /self-study 一致'
+  }
+  if (e && e.code === 'ECONNABORTED') {
+    return '请求超时：后端未响应或网络较慢'
+  }
+  return m || '请求失败'
+}

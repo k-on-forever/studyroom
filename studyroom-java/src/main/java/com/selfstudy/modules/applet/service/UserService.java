@@ -6,12 +6,11 @@ import com.selfstudy.common.utils.R;
 import com.selfstudy.modules.applet.entity.UserEntity;
 import com.selfstudy.modules.applet.form.LoginForm;
 import com.selfstudy.modules.applet.form.WXLoginForm;
-import me.chanjar.weixin.common.error.WxErrorException;
 
 /**
  * 用户
  *
- * @author Mark 2891517520@qq.com
+ * @author kon-foreverkon-forever
  */
 public interface UserService extends IService<UserEntity> {
 
@@ -34,5 +33,8 @@ public interface UserService extends IService<UserEntity> {
 	 * @return
 	 */
 	R wxLogin(WXLoginForm wxLoginForm);
+
+	/** 已通过短信校验后更新密码（明文） */
+	boolean resetPassword(String account, String newPlainPassword);
 
 }

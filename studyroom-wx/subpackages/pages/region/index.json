@@ -7,7 +7,8 @@
     "van-tab": "/libs/vant-ui/tab/index",
     "van-tabs": "/libs/vant-ui/tabs/index",
     "van-button": "/libs/vant-ui/button/index",
-    "van-field": "/libs/vant-ui/field/index"
+    "van-field": "/libs/vant-ui/field/index",
+    "van-loading": "/libs/vant-ui/loading/index"
   },
   "navigationBarTitleText": "预定"
 }
