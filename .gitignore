@@ -1,0 +1,38 @@
+# 敏感配置文件
+studyroom-java/src/main/resources/application-dev.yml
+studyroom-java/src/main/resources/application-prod.yml
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# 构建产物
+target/
+node_modules/
+dist/
+build/
+
+# 临时文件
+*.log
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# 上传文件
+data/upload/
+
+# 打包文件
+*.tar.gz
+*.zip
+*.jar
+*.war
+
+# 环境变量文件
+.env
+.env.local
+.env.*.local
+
+# 微信小程序
+project.private.config.json
