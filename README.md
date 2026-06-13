@@ -72,55 +72,68 @@ studyroom/
 
 ### 小程序端
 
-#### 首页
+<table>
+  <tr>
+    <td align="center"><b>首页</b></td>
+    <td align="center"><b>选座预约</b></td>
+    <td align="center"><b>选座详情</b></td>
+  </tr>
+  <tr>
+    <td><img src="images/wx-home1.png" width="200"/></td>
+    <td><img src="images/wx-region1.png" width="200"/></td>
+    <td><img src="images/wx-region2.png" width="200"/></td>
+  </tr>
+</table>
 
-<img src="images/wx-home1.png" alt="首页" style="zoom: 67%;" />
+<table>
+  <tr>
+    <td align="center"><b>入座管理</b></td>
+    <td align="center"><b>个人中心</b></td>
+    <td align="center"><b>登录注册</b></td>
+  </tr>
+  <tr>
+    <td><img src="images/wx-application.png" width="200"/></td>
+    <td><img src="images/wx-my.png" width="200"/></td>
+    <td><img src="images/wx-login.png" width="200"/></td>
+  </tr>
+</table>
 
-#### 选座预约
-
-<img src="images/wx-region1.png" alt="选座1" style="zoom:67%;" />
-
-<img src="images/wx-region2.png" alt="选座2" style="zoom:67%;" />
-
-#### 入座管理
-
-<img src="images/wx-application.png" alt="入座" style="zoom:67%;" />
-
-#### 个人中心
-
-<img src="images/wx-my.png" alt="我的" style="zoom:67%;" />
-
-#### 登录注册
-
-<img src="images/wx-login.png" alt="登录" style="zoom:67%;" />
-
-#### 预约记录
-
-<img src="images/wx-booking-record.png" alt="预约记录" style="zoom:67%;" />
-
-#### 会员卡
-
-<img src="images/wx-membership.png" alt="会员卡" style="zoom:67%;" />
-
-<img src="images/wx-membership-buy.png" alt="购买会员卡" style="zoom:67%;" />
+<table>
+  <tr>
+    <td align="center"><b>预约记录</b></td>
+    <td align="center"><b>会员卡</b></td>
+    <td align="center"><b>购买会员卡</b></td>
+  </tr>
+  <tr>
+    <td><img src="images/wx-booking-record.png" width="200"/></td>
+    <td><img src="images/wx-membership.png" width="200"/></td>
+    <td><img src="images/wx-membership-buy.png" width="200"/></td>
+  </tr>
+</table>
 
 ### 管理端
 
-#### 运营看板
+<table>
+  <tr>
+    <td align="center"><b>运营看板</b></td>
+    <td align="center"><b>座位管理</b></td>
+  </tr>
+  <tr>
+    <td><img src="images/admin-dashboard.png" width="400"/></td>
+    <td><img src="images/admin-seat.png" width="400"/></td>
+  </tr>
+</table>
 
-![看板](images/admin-dashboard.png)
-
-#### 座位管理
-
-![座位](images/admin-seat.png)
-
-#### 预约管理
-
-![预约](images/admin-appointment.png)
-
-#### 操作日志
-
-![日志](images/operate.png)
+<table>
+  <tr>
+    <td align="center"><b>预约管理</b></td>
+    <td align="center"><b>操作日志</b></td>
+  </tr>
+  <tr>
+    <td><img src="images/admin-appointment.png" width="400"/></td>
+    <td><img src="images/operate.png" width="400"/></td>
+  </tr>
+</table>
 
 ---
 
