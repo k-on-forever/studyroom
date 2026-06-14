@@ -135,6 +135,28 @@ studyroom/
   </tr>
 </table>
 
+<table>
+  <tr>
+    <td align="center"><b>会员卡管理</b></td>
+    <td align="center"><b>留言管理</b></td>
+  </tr>
+  <tr>
+    <td><img src="images/admin-membership-card.png" width="400"/></td>
+    <td><img src="images/admin-message.png" width="400"/></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center"><b>楼层管理</b></td>
+    <td align="center"><b>自习室管理</b></td>
+  </tr>
+  <tr>
+    <td><img src="images/admin-floor.png" width="400"/></td>
+    <td><img src="images/admin-studyroom.png" width="400"/></td>
+  </tr>
+</table>
+
 ---
 
 ## 快速启动
