@@ -113,21 +113,37 @@ studyroom/
 
 ### 管理端
 
-| 运营看板 | 座位管理 |
-|:---:|:---:|
-| <img src="images/admin-dashboard.png" width="400"/> | <img src="images/admin-seat.png" width="400"/> |
+**运营看板**
 
-| 预约管理 | 操作日志 |
-|:---:|:---:|
-| <img src="images/admin-appointment.png" width="400"/> | <img src="images/operate.png" width="400"/> |
+![运营看板](images/admin-dashboard.png)
 
-| 会员卡管理 | 留言管理 |
-|:---:|:---:|
-| <img src="images/admin-membership-card.png" width="400"/> | <img src="images/admin-message.png" width="400"/> |
+**座位管理**
 
-| 楼层管理 | 自习室管理 |
-|:---:|:---:|
-| <img src="images/admin-floor.png" width="400"/> | <img src="images/admin-studyroom.png" width="400"/> |
+![座位管理](images/admin-seat.png)
+
+**预约管理**
+
+![预约管理](images/admin-appointment.png)
+
+**操作日志**
+
+![操作日志](images/operate.png)
+
+**会员卡管理**
+
+![会员卡管理](images/admin-membership-card.png)
+
+**留言管理**
+
+![留言管理](images/admin-message.png)
+
+**楼层管理**
+
+![楼层管理](images/admin-floor.png)
+
+**自习室管理**
+
+![自习室管理](images/admin-studyroom.png)
 
 ---
 
