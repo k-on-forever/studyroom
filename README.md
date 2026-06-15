@@ -113,49 +113,21 @@ studyroom/
 
 ### 管理端
 
-<table>
-  <tr>
-    <td align="center"><b>运营看板</b></td>
-    <td align="center"><b>座位管理</b></td>
-  </tr>
-  <tr>
-    <td><img src="images/admin-dashboard.png" width="400"/></td>
-    <td><img src="images/admin-seat.png" width="400"/></td>
-  </tr>
-</table>
+| 运营看板 | 座位管理 |
+|:---:|:---:|
+| <img src="images/admin-dashboard.png" width="400"/> | <img src="images/admin-seat.png" width="400"/> |
 
-<table>
-  <tr>
-    <td align="center"><b>预约管理</b></td>
-    <td align="center"><b>操作日志</b></td>
-  </tr>
-  <tr>
-    <td><img src="images/admin-appointment.png" width="400"/></td>
-    <td><img src="images/operate.png" width="400"/></td>
-  </tr>
-</table>
+| 预约管理 | 操作日志 |
+|:---:|:---:|
+| <img src="images/admin-appointment.png" width="400"/> | <img src="images/operate.png" width="400"/> |
 
-<table>
-  <tr>
-    <td align="center"><b>会员卡管理</b></td>
-    <td align="center"><b>留言管理</b></td>
-  </tr>
-  <tr>
-    <td><img src="images/admin-membership-card.png" width="400"/></td>
-    <td><img src="images/admin-message.png" width="400"/></td>
-  </tr>
-</table>
+| 会员卡管理 | 留言管理 |
+|:---:|:---:|
+| <img src="images/admin-membership-card.png" width="400"/> | <img src="images/admin-message.png" width="400"/> |
 
-<table>
-  <tr>
-    <td align="center"><b>楼层管理</b></td>
-    <td align="center"><b>自习室管理</b></td>
-  </tr>
-  <tr>
-    <td><img src="images/admin-floor.png" width="400"/></td>
-    <td><img src="images/admin-studyroom.png" width="400"/></td>
-  </tr>
-</table>
+| 楼层管理 | 自习室管理 |
+|:---:|:---:|
+| <img src="images/admin-floor.png" width="400"/> | <img src="images/admin-studyroom.png" width="400"/> |
 
 ---
 
